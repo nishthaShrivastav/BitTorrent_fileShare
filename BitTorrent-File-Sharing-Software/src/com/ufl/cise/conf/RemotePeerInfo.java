@@ -44,7 +44,7 @@ public class RemotePeerInfo{
 	    public void set_Interested() {
 	        interested.set (true);
 	    }
-	    public void set_NotIterested() {
+	    public void set_NotInterested() {
 	        interested.set (false);
 	    }
 	    public int getPort() {
