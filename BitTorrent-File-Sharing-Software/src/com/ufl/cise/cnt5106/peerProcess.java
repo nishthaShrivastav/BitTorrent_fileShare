@@ -5,8 +5,7 @@ import java.util.*;
 
 import com.ufl.cise.conf.*;
 
-import edu.ufl.cise.cnt5106c.Process;
-import edu.ufl.cise.cnt5106c.conf.RemotePeerInfo;
+
 
 public class peerProcess {
 
