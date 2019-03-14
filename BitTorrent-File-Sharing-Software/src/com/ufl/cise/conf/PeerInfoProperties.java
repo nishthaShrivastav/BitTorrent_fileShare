@@ -30,7 +30,7 @@ public class PeerInfoProperties {
 	           
 	 }
 	 
-	 public LinkedList<RemotePeerInfo> getPeerInfo () {
+	 public Collection<RemotePeerInfo> getPeerInfo () {
 	        return new LinkedList<>(_peerInfoVector);
 	    }
 }

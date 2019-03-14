@@ -6,7 +6,6 @@ import java.util.*;
 import com.ufl.cise.conf.*;
 
 
-
 public class peerProcess {
 
 	public static void main(String[] args) throws Exception {
@@ -56,8 +55,11 @@ public class peerProcess {
 			catch(Exception e) {}
 			
 		}
-		
-		// Process peerProc = new Process (peerId, address, port, hasFile, peerInfo.getPeerInfo(), common);
+		Process proc = new Process(peerId, port, address, peerInfo.getPeerInfo(), hasFile, common);
+        proc.startProcess();
+        Thread t = new Thread (proc);
+        t.start();
+        //connect to peers
 	}
 
 }
