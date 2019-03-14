@@ -28,6 +28,8 @@ public enum CommonProperties{
                     throws IOException {
                 BufferedReader in = new BufferedReader(reader);
                 int i = 0;
+                
+                
                 for (String line; (line = in.readLine()) != null; i++) {
                     line = line.trim();
                     if ((line.length() <= 0) || (line.startsWith ("#"))) {
