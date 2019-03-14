@@ -6,7 +6,7 @@ import java.io.Reader;
 import java.text.ParseException;
 import java.util.Properties;
 
-import edu.ufl.cise.cnt5106c.conf.CommonProperties;
+
 
 public enum CommonProperties{
 

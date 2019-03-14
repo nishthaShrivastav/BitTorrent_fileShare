@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.ByteBuffer;
 
 
-
+//basic handshake functions
 public class Handshake {
 	private static String message = "";
 	private static final String HANDSHAKE_HEADER = "P2PFILESHARINGPROJ0000000000";
