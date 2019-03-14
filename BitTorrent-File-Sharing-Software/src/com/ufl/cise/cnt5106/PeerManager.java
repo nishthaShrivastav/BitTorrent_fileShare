@@ -5,9 +5,7 @@ import java.util.*;
 import com.ufl.cise.conf.CommonProperties;
 import com.ufl.cise.conf.RemotePeerInfo;
 
-import edu.ufl.cise.cnt5106c.PeerManager.OptimisticUnchoker;
-import edu.ufl.cise.cnt5106c.log.EventLogger;
-import edu.ufl.cise.cnt5106c.log.LogHelper;
+
 
 public class PeerManager implements Runnable{
 	
