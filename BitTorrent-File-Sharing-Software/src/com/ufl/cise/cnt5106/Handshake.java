@@ -24,7 +24,7 @@ public class Handshake {
 	}
 
 	
-	public static synchronized byte[] Message_get() {
+	public static synchronized byte[] message_get() {
 		//byte[] hand_shake = new byte[32];
 		return (message.getBytes());
 		//Bb.get(hand_shake);
