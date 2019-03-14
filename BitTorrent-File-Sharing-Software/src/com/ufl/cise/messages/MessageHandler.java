@@ -5,8 +5,6 @@ import java.nio.ByteBuffer;
 import com.ufl.cise.cnt5106.Handshake;
 import com.ufl.cise.messages.Mesaage.MsgType;
 
-import p2p.Message.Type;
-
 public class MessageHandler {
 	public static MessageHandler messageHandler;
 

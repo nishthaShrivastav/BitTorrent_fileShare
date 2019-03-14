@@ -6,28 +6,52 @@ import java.io.Reader;
 import java.text.ParseException;
 import java.util.Properties;
 
-public class CommonProperties extends Properties {
-	
-	public static final String CONFIG_FILE_NAME = "Common.cfg";
-	
-	public static Properties read (Reader reader) throws Exception {
-		CommonProperties conf = new CommonProperties();
-		conf.load(reader);
-		return conf;
-	}
-	
-	@Override
-	public synchronized void load(Reader reader) throws IOException {
-		  BufferedReader in = new BufferedReader(reader);
-          int i = 0;
-          for (String line; (line = in.readLine()) != null; i++) {
-              line = line.trim();
-              String[] props = line.split("\\s+");
-              if (props.length!=2) {
-            	  throw new IOException(new ParseException (line, i));
-              }
-              setProperty(props[0].trim(), props[1].trim());
-              
-          }   
-	}
+import edu.ufl.cise.cnt5106c.conf.CommonProperties;
+
+public enum CommonProperties{
+
+
+    NumberOfPreferredNeighbors,
+    UnchokingInterval,
+    OptimisticUnchokingInterval,
+    FileName,
+    FileSize,
+    PieceSize;
+
+    public static final String CONFIG_FILE_NAME = "Common.cfg";
+
+    public static Properties read (Reader reader) throws Exception {
+
+        final Properties conf = new Properties () {
+            @Override
+            public synchronized void load(Reader reader)
+                    throws IOException {
+                BufferedReader in = new BufferedReader(reader);
+                int i = 0;
+                for (String line; (line = in.readLine()) != null; i++) {
+                    line = line.trim();
+                    if ((line.length() <= 0) || (line.startsWith ("#"))) {
+                        continue;
+                    }
+                    
+                    String[] tokens = line.split("\\s+");
+                    if (tokens.length != 2) {
+                        throw new IOException (new ParseException (line, i));
+                    }
+                    setProperty(tokens[0].trim(), tokens[1].trim());
+                }
+            }
+        };
+
+        conf.load (reader);
+
+        for (CommonProperties prop : CommonProperties.values()) {
+            if (!conf.containsKey(prop.toString())) {
+                throw new Exception ("config file does not contain property " + prop);
+            }
+        }
+
+        return conf;
+    }
+
 }
