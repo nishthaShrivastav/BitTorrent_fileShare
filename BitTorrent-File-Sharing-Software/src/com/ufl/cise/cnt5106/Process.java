@@ -1,12 +1,13 @@
 package com.ufl.cise.cnt5106;
-
+/*
+ * Implements runnable interface
+ * TO do: run method
+ * **/
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
-
-import com.ufl.cise.conf.CommonProperties;
 import com.ufl.cise.conf.RemotePeerInfo;
 
 

@@ -1,4 +1,8 @@
 package com.ufl.cise.cnt5106;
+/*Get interested peers and provides all info about the peers choked and unchoked
+ * Manages connections of peer with othe peers 
+ * 
+ */
 
 import java.util.*;
 
@@ -12,8 +16,8 @@ public class PeerManager implements Runnable{
 	private final int prefNeighborsCount;
 	private final int bitSize;
     private final int unchokingInterval;
-    private final List<RemotePeerInfo> peers = new ArrayList<>();
-    private final Collection<RemotePeerInfo> prefPeers = new HashSet<>();
+    private final List<RemotePeerInfo> peers = new ArrayList<RemotePeerInfo>();
+    private final Collection<RemotePeerInfo> prefPeers = new HashSet<RemotePeerInfo>();
     
     PeerManager(int peerId, int bitsize, Collection<RemotePeerInfo> peerList, Properties conf) {
     	peers.addAll(peerList);
@@ -53,7 +57,7 @@ public class PeerManager implements Runnable{
     	
     }
     public synchronized List<RemotePeerInfo> getInterestedPeers(){
-    	List<RemotePeerInfo> peersIn = new ArrayList();
+    	List<RemotePeerInfo> peersIn = new ArrayList<RemotePeerInfo>();
     	for(RemotePeerInfo remotePeer : peersIn) {
     		if(remotePeer.isInterested()) {
     			peersIn.add(remotePeer);

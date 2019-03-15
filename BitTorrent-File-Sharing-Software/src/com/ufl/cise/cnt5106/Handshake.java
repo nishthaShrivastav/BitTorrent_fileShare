@@ -1,7 +1,6 @@
 package com.ufl.cise.cnt5106;
 import java.util.Arrays;
 import java.nio.charset.StandardCharsets;
-import java.nio.ByteBuffer;
 
 
 //basic handshake functions

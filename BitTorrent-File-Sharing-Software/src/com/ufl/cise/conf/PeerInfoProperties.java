@@ -1,5 +1,8 @@
 package com.ufl.cise.conf;
 
+/*
+ * This class reads the PeerInfo.cfg file
+ * */
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;

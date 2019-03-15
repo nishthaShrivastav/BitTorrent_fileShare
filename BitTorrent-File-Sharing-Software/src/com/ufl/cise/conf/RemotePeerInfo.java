@@ -1,9 +1,6 @@
 package com.ufl.cise.conf;
 import java.util.BitSet;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
-
 
 public class RemotePeerInfo{
 
@@ -54,13 +51,6 @@ public class RemotePeerInfo{
 	        return Integer.parseInt(peerId);
 	    }
 
-	    
-
-
-	    
-	    
-
-	    
 	    @Override
 	    public boolean equals (Object obj) {
 	    	if (obj instanceof RemotePeerInfo) {
