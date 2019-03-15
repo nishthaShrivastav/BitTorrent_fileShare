@@ -7,7 +7,15 @@ import java.text.ParseException;
 import java.util.Properties;
 
 
-
+/*
+ * This program has been written to split the file
+ * and check following properties:
+ * Number of Preferred Neighbours
+ * The unchoking interval
+ * File name
+ * File size
+ * Piece Size
+ */
 public enum CommonProperties{
 
 
