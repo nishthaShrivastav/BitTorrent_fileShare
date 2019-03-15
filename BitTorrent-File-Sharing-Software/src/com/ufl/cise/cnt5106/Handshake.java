@@ -3,7 +3,7 @@ import java.util.Arrays;
 import java.nio.charset.StandardCharsets;
 
 
-//basic handshake functions
+// This program has basic handshake functions 
 public class Handshake {
 	private static String message = "";
 	private static final String HANDSHAKE_HEADER = "P2PFILESHARINGPROJ0000000000";
@@ -22,7 +22,11 @@ public class Handshake {
 		
 	}
 
-	
+/*
+ * Functions to get Id,set Id, get message 
+ * and verify the message have been written
+ * below
+ */
 	public static synchronized byte[] message_get() {
 		//byte[] hand_shake = new byte[32];
 		return (message.getBytes());

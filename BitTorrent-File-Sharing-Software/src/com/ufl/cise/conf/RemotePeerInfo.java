@@ -2,9 +2,19 @@ package com.ufl.cise.conf;
 import java.util.BitSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/*
+ * This file is created to write the information about peers
+ * Here we have stored information about Peer Id, Peer port
+ * Information of :
+ * Adding the Peers, The Bytes which are downloaded,
+ * To check whether the peer has the file or not
+ * If the peer is interested in sharing the file
+ * If the peer has received the requested parts
+ */
 public class RemotePeerInfo{
 
 	 public String peerId;
+	 
 	    public String peerPort;
 	    public String peerAdd;
 	    public Integer bytes_Downloaded_From;
@@ -24,6 +34,7 @@ public class RemotePeerInfo{
 	        
 	        
 	    }
+	   
 	    public RemotePeerInfo (int peerId) {
 	        this (Integer.toString (peerId), "127.0.0.1", "0", false);
 	    }
