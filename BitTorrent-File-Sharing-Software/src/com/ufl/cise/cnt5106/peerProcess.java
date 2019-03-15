@@ -5,7 +5,17 @@ import java.util.*;
 
 import com.ufl.cise.conf.*;
 
-
+/*
+ * main function to start program
+ * 
+ * peer id has argument 
+ * read common config file
+ * read peer config file
+ * 
+ * identify peers to communicate with and 
+ * create process to communicate  
+ * 
+ */
 public class peerProcess {
 
 	public static void main(String[] args) throws Exception {

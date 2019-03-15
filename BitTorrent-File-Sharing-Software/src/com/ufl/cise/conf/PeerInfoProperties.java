@@ -1,12 +1,22 @@
 package com.ufl.cise.conf;
 
 import java.io.BufferedReader;
+
+
 import java.io.IOException;
 import java.io.Reader;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.LinkedList;
 
+
+/*
+ * class to read peer info config file
+ * read from file split and stored 
+ * the information of peers into a linked list vector
+ * 
+ * write function to get peerid as well 
+ */
 public class PeerInfoProperties {
 
 	 public static final String CONFIG_FILE_NAME = "PeerInfo.cfg";

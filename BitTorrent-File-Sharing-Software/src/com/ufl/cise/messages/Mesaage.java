@@ -2,6 +2,9 @@ package com.ufl.cise.messages;
 
 import java.nio.ByteBuffer;
 
+/*
+ * class to identify message types
+ */
 public class Mesaage {
 	
 	protected ByteBuffer bytebuffer;
