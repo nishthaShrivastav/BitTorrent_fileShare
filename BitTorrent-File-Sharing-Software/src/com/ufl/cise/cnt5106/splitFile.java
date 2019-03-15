@@ -13,6 +13,10 @@ import java.util.concurrent.LinkedBlockingQueue;
  * file created to split the file into pieces 
  * run method yet to be written
  * function to get the requested piece to be written 
+ * 
+ * 
+ * function written here to split the file into pieces using concurrent data structures
+ * and data input output streams 
  */
 public class splitFile extends Thread{
 	
