@@ -17,7 +17,11 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
-
+/*
+ * file created to split the file into pieces 
+ * run method yet to be written
+ * function to get the requested piece to be written 
+ */
 public class splitFile extends Thread{
 	
 	public LinkedBlockingQueue<byte[]> fileQueue;
