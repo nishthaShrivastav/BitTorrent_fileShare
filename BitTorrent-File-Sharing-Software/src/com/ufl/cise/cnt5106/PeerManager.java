@@ -1,6 +1,7 @@
 package com.ufl.cise.cnt5106;
 /*Get interested peers and provides all info about the peers choked and unchoked
- * Manages connections of peer with othe peers 
+ * Manages connections of peer with other peers
+ * TO DO: add choking interval functions  
  * 
  */
 

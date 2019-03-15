@@ -1,7 +1,4 @@
 package com.ufl.cise.cnt5106;
-/*Peer id is provided as argument to this class. It starts connecting to other peers(previous peers) and starts handshake and other messages
- * 
- */
 import java.io.*;
 import java.util.*;
 
