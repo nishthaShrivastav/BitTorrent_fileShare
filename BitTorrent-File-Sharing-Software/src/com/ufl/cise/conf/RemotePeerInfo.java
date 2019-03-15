@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class RemotePeerInfo{
 
 	 public String peerId;
+	 
 	    public String peerPort;
 	    public String peerAdd;
 	    public Integer bytes_Downloaded_From;
