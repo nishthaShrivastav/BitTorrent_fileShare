@@ -2,13 +2,17 @@ package com.ufl.cise.cnt5106;
 
 
 import java.io.DataInputStream;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.concurrent.LinkedBlockingQueue;
+
+
 /*
  * file created to split the file into pieces 
  * run method yet to be written
@@ -23,13 +27,14 @@ public class splitFile extends Thread{
 	public LinkedBlockingQueue<byte[]> fileQueue;
 	private static splitFile split;
 	private volatile static BitSet filePieces;
+	private volatile HashMap<Connection, Integer> requestedPieces;
 	//create a map for pieces and piece index
-	//create map for each connection andtheir status? 
-	
+	//create map for each connection and their status? 
 	
 	
 	private splitFile() {
 		fileQueue = new LinkedBlockingQueue<>();
+		requestedPieces = new HashMap<>();
 	
 	}
 	

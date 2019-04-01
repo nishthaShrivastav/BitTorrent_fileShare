@@ -1,9 +1,12 @@
 package com.ufl.cise.cnt5106;
 
 import java.io.DataOutputStream;
+
 import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.LinkedBlockingQueue;
+
+
 
 /*
  * write run method and server socket upload methods
@@ -22,6 +25,10 @@ public class Upload implements Runnable {
 
 
 	public Upload(Socket socket, SharedData data) {
+		init(socket, data);
+	}
+	
+	public Upload(Socket socket, String id, SharedData data) {
 		init(socket, data);
 	}
 	private void init(Socket client, SharedData data) {
