@@ -22,7 +22,6 @@ import java.util.LinkedList;
  */
 public class PeerInfoProperties {
 
-	 public static final String CONFIG_FILE_NAME = "PeerInfo.cfg";
 	  private final Collection<RemotePeerInfo> _peerInfoVector = new LinkedList<>();
 	 
 	 public void read (Reader reader) throws ParseException, IOException{

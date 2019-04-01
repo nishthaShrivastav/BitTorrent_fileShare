@@ -20,7 +20,7 @@ public class peerProcess {
 	public static void main(String[] args) throws Exception {
 		
 		if(args.length!=1) {
-			throw new Exception("The numbe rof arguments passed is  "+args.length+" but the required length is 1");
+			throw new Exception("The number of arguments passed is  "+args.length+" but the required length is 1");
 			
 		}
 		final int peerId = Integer.parseInt(args[0]);
@@ -34,9 +34,8 @@ public class peerProcess {
 		Collection<RemotePeerInfo> peersToConnect= new LinkedList<>();
 		
 		try {
-			commonReader = new FileReader(CommonProperties.CONFIG_FILE_NAME);
-			common= CommonProperties.read(commonReader);
-			peerReader = new FileReader(PeerInfoProperties.CONFIG_FILE_NAME);
+			new LoadProperties();
+			peerReader = new FileReader(Constants.PEER_CONFIG_FILE_NAME);
 			peerInfo.read(peerReader);
 			for( RemotePeerInfo peer : peerInfo.getPeerInfo()) {
 				if(peer.getPeerId()==peerId) {
@@ -64,6 +63,7 @@ public class peerProcess {
 			catch(Exception e) {}
 			
 		}
+		
 		Process proc = new Process(peerId, port, address, peerInfo.getPeerInfo(), hasFile, common);
         proc.startProcess();
         Thread t = new Thread (proc);

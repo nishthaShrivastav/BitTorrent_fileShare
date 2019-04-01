@@ -7,7 +7,7 @@ package com.ufl.cise.cnt5106;
 
 import java.util.*;
 
-import com.ufl.cise.conf.CommonProperties;
+import com.ufl.cise.conf.Common;
 import com.ufl.cise.conf.RemotePeerInfo;
 
 
@@ -22,10 +22,8 @@ public class PeerManager implements Runnable{
     
     PeerManager(int peerId, int bitsize, Collection<RemotePeerInfo> peerList, Properties conf) {
     	peers.addAll(peerList);
-    	prefNeighborsCount = Integer.parseInt(
-                conf.getProperty(CommonProperties.NumberOfPreferredNeighbors.toString()));
-        unchokingInterval = Integer.parseInt(
-                conf.getProperty(CommonProperties.UnchokingInterval.toString())) * 1000;
+    	prefNeighborsCount = Common.getNumberOfPreferredNeighbors();
+        unchokingInterval = Common.getUnchokingInterval() * 1000;
         this.bitSize = bitsize;
 
     	
