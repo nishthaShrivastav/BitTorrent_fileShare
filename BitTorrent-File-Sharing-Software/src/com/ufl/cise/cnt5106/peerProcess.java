@@ -20,7 +20,7 @@ public class peerProcess {
 	public static void main(String[] args) throws Exception {
 		
 		if(args.length!=1) {
-			throw new Exception("The number of arguments passed is  "+args.length+" but the required length is 1");
+			throw new Exception("The numbe rof arguments passed is  "+args.length+" but the required length is 1");
 			
 		}
 		final int peerId = Integer.parseInt(args[0]);
