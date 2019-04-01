@@ -41,4 +41,9 @@ public class SharedData implements Runnable{
 		// take messaage from queue to process handshake
 	}
 
+	public void addPayload(byte[] payload) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
