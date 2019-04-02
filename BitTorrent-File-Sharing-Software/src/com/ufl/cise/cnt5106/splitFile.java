@@ -4,10 +4,13 @@ package com.ufl.cise.cnt5106;
 import java.io.DataInputStream;
 
 
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Properties;
@@ -15,7 +18,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import com.ufl.cise.conf.Common;
-
 
 /*
  * file created to split the file into pieces 
@@ -50,6 +52,8 @@ public class splitFile extends Thread{
 		}
 		return split;
 	}
+	
+	//static split?? 
 	
 	public void split() {
 		File filePtr = new File(Common.getFileName()); //add path to the file
@@ -117,7 +121,51 @@ public class splitFile extends Thread{
 	public synchronized int getReceivedFileSize() {
 		return filePieces.cardinality();
 	}
+
+	public boolean hasAnyPieces() {
+		// TODO Auto-generated method stub
+		return filePieces.nextSetBit(0) != -1;
+	}
 	
-	//we still have to add functions to write to file 
-	//and getting the actual requested piece
+	@Override
+	public void run() {
+		while (true) {
+			try {
+				byte[] payload = fileQueue.take();
+				int pieceIndex = ByteBuffer.wrap(payload, 0, 4).getInt();
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+	}
+	
+	public synchronized void setPiece(byte[] payload) {
+		filePieces.set(ByteBuffer.wrap(payload, 0, 4).getInt());
+		file.put(ByteBuffer.wrap(payload, 0, 4).getInt(), Arrays.copyOfRange(payload, 4, payload.length));
+		try {
+			fileQueue.put(payload);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	//we still have to add functions to write to file and getting the actual requested piece
+	
+	
+	protected BitSet getFilePieces() {
+		return filePieces;
+	}
+
+	public synchronized void addRequestedPiece(Connection connection, int pieceIndex) {
+		requestedPieces.put(connection, pieceIndex);
+
+	}
+
+	public synchronized void removeRequestedPiece(Connection connection) {
+		requestedPieces.remove(connection);
+	}
+
 }

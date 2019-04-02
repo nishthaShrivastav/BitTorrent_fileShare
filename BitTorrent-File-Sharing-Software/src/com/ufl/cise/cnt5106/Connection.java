@@ -42,6 +42,18 @@ public class Connection {
 		sharedData.run();
 	}
 
+	public void setPeerId(String remotePeerId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
+
+	public void addAllConnections() {
+		// TODO Auto-generated method stub
+		
+	}
+
 	
 	//methods wrt connection manager not written 
 }

@@ -4,13 +4,8 @@ import java.io.DataOutputStream;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.concurrent.LinkedBlockingQueue;
-
-
-
-/*
- * write run method and server socket upload methods
- */
 
 public class Upload implements Runnable {
 
@@ -51,7 +46,31 @@ public class Upload implements Runnable {
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
+		while (isAlive) {
+			try {
+				int messageLength = uploadLengthQueue.take();
+				out.writeInt(messageLength);
+				out.flush();
+				byte[] payload = uploadPayloadQueue.take();
+				out.write(payload);
+				out.flush();
+			} catch (SocketException e) {
+				isAlive = false;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 		
+	}// end run 
+	
+	public void addMessage(int length, byte[] payload) {
+		try {
+			uploadLengthQueue.put(length);
+			uploadPayloadQueue.put(payload);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
