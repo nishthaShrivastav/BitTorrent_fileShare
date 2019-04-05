@@ -2,6 +2,7 @@ package com.ufl.cise.cnt5106;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.BitSet;
 
 
 
@@ -78,6 +79,7 @@ public class Connection {
 		// TODO Auto-generated method stub
 		return remotePeerId;
 	}
+
 	public void close() {
 		try {
 			peerSocket.close();
@@ -86,6 +88,12 @@ public class Connection {
 			e.printStackTrace();
 		}
 	}
-	
-	//methods wrt connection manager not written 
+
+
+	public BitSet getPeerBitSet() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
 }
