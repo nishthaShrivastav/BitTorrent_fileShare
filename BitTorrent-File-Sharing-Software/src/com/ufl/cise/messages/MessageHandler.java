@@ -3,7 +3,7 @@ package com.ufl.cise.messages;
 import java.nio.ByteBuffer;
 
 import com.ufl.cise.cnt5106.Handshake;
-import com.ufl.cise.messages.Mesaage.MsgType;
+import com.ufl.cise.messages.Message.MsgType;
 
 /*
  * class to handle types of messages 

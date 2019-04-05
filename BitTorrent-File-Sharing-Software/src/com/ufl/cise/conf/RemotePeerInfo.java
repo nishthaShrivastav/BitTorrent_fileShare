@@ -13,56 +13,69 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class RemotePeerInfo{
 
-	 public String peerId;
-	 
+
+
+		public String peerId;
+	 	public int id;
 	    public String peerPort;
-	    public String peerAdd;
-	    public Integer bytes_Downloaded_From;
-	    public boolean Has_File;
-	    private AtomicBoolean interested  ;
-	    public BitSet Received_parts;
+	    public boolean hasFile;
+	    private String hostName;
 	    
-	    public RemotePeerInfo(String P_address, String P_ID, String P_Port, boolean hasFile) {
+	    public RemotePeerInfo(String P_id, String H_Name, String P_Port, boolean Has_File) {
 	        
-	        peerAdd = P_address;
-	        peerId = P_ID;
-	        Has_File = hasFile;
+	        peerId = P_id;
+	        hasFile = Has_File;
 	        peerPort = P_Port;
-	        Received_parts = new BitSet();
-	        interested = new AtomicBoolean (false);
-	        bytes_Downloaded_From = new Integer (0);
-	        
-	        
+	        hostName=H_Name;
 	    }
 	   
 	    public RemotePeerInfo (int peerId) {
 	        this (Integer.toString (peerId), "127.0.0.1", "0", false);
 	    }
 
-	    public String getPeer_Address() {
-	        return peerAdd;
-	    }
 
-	    public boolean has_File() {
-	        return Has_File;
-	    }
-	    public boolean isInterested() {
-	        return interested.get();
-	    }
-	    public void set_Interested() {
-	        interested.set (true);
-	    }
-	    public void set_NotInterested() {
-	        interested.set (false);
-	    }
-	    public int getPort() {
-	        return Integer.parseInt(peerPort);
-	    }
-	    public int getPeerId() {
-	        return Integer.parseInt(peerId);
-	    }
 
-	    @Override
+	    public String getPeerId() {
+			return peerId;
+		}
+
+		public void setPeerId(String peerId) {
+			this.peerId = peerId;
+		}
+
+		public int getId() {
+			return id;
+		}
+
+		public void setId(int id) {
+			this.id = id;
+		}
+
+		public int getPeerPort() {
+			return Integer.parseInt(peerPort);
+		}
+
+		public void setPeerPort(String peerPort) {
+			this.peerPort = peerPort;
+		}
+
+		public boolean isHasFile() {
+			return hasFile;
+		}
+
+		public void setHasFile(boolean hasFile) {
+			this.hasFile = hasFile;
+		}
+
+		public String getHostName() {
+			return hostName;
+		}
+
+		public void setHostName(String hostName) {
+			this.hostName = hostName;
+		}
+
+		@Override
 	    public boolean equals (Object obj) {
 	    	if (obj instanceof RemotePeerInfo) {
 	            return (((RemotePeerInfo) obj).peerId.equals (peerId));

@@ -5,72 +5,53 @@ package com.ufl.cise.cnt5106;
  * 
  */
 
+import java.net.Socket;
 import java.util.*;
+import com.ufl.cise.conf.*;
 
-import com.ufl.cise.conf.CommonProperties;
-import com.ufl.cise.conf.RemotePeerInfo;
-
-
-
-public class PeerManager implements Runnable{
+public class PeerManager{
 	
-	private final int prefNeighborsCount;
-	private final int bitSize;
-    private final int unchokingInterval;
-    private final List<RemotePeerInfo> peers = new ArrayList<RemotePeerInfo>();
-    private final Collection<RemotePeerInfo> prefPeers = new HashSet<RemotePeerInfo>();
-    
-    PeerManager(int peerId, int bitsize, Collection<RemotePeerInfo> peerList, Properties conf) {
-    	peers.addAll(peerList);
-    	prefNeighborsCount = Integer.parseInt(
-                conf.getProperty(CommonProperties.NumberOfPreferredNeighbors.toString()));
-        unchokingInterval = Integer.parseInt(
-                conf.getProperty(CommonProperties.UnchokingInterval.toString())) * 1000;
-        this.bitSize = bitsize;
+	private static PeerManager peerManager;
+	private HashSet<Connection> connections;
+	private HashSet<Connection> uninterested;
+	private PriorityQueue<Connection> prefNeighbors;
+	public HashSet<String> peersWithFullFile = new HashSet<String>();
+	private int num_pref = Common.getNumberOfPreferredNeighbors();
+	private int opt_unchoking = Common.getOptimisticUnchokingInterval();
+	private int unchoking = Common.getUnchokingInterval();
+	
+	private int num_peers= PeerInfoProperties.numberOfPeers();
+	private splitFile file;
+//	private BroadcastThread broadcaster;
 
-    	
-    }
+	
+	private PeerManager() {
 
-    synchronized RemotePeerInfo findPeer(int peerId) {
-        for (RemotePeerInfo peer : peers) {
-            if (peer.getPeerId() == peerId) {
-                return peer;
-            }
-        }
-        return null;
-    }
-    synchronized void setPeerInterested(int remotePeerId) {
-        RemotePeerInfo peer = findPeer(remotePeerId);
-        if (peer != null) {
-            peer.set_Interested();
-        }
-    }
+		uninterested = new HashSet<>();
+//		prefNeighbors = new PriorityQueue<>(num_pref + 1,
+//				(a, b) -> (int) a.getBytesDownloaded() - (int) b.getBytesDownloaded());
+//		broadcaster = BroadcastThread.getInstance();
+//		sharedFile = SharedFile.getInstance();
+//		allConnections = new HashSet<>();
+//		monitor();
+	
+	}
+	
+	public static PeerManager getPeerManager() {
 
-    public int getUnchokingInterval() {
-    	return unchokingInterval;
-    }
-    
-    public synchronized void setPeerUninterestPeer(int remotePeerId) {
-    	 RemotePeerInfo peer = findPeer(remotePeerId);
-         if (peer != null) {
-             peer.set_NotInterested();;
-         }
-    	
-    }
-    public synchronized List<RemotePeerInfo> getInterestedPeers(){
-    	List<RemotePeerInfo> peersIn = new ArrayList<RemotePeerInfo>();
-    	for(RemotePeerInfo remotePeer : peersIn) {
-    		if(remotePeer.isInterested()) {
-    			peersIn.add(remotePeer);
-    		}
-    	}
-    	return peersIn;
-    }
-	@Override
-	public void run() {
+		if (peerManager == null) {
+			peerManager = new PeerManager();
+		}
+		return peerManager;
+	
+		
+	}
+	public void createConnection(Socket peerSocket) {
+		
 		// TODO Auto-generated method stub
 		
 	}
-	
 
+	
+	
 }

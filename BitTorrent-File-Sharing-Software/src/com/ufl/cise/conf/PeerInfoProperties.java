@@ -22,8 +22,7 @@ import java.util.LinkedList;
  */
 public class PeerInfoProperties {
 
-	 public static final String CONFIG_FILE_NAME = "PeerInfo.cfg";
-	  private final Collection<RemotePeerInfo> _peerInfoVector = new LinkedList<>();
+	 private final static Collection<RemotePeerInfo> allPeers = new LinkedList<>();
 	 
 	 public void read (Reader reader) throws ParseException, IOException{
 		 BufferedReader in = new BufferedReader(reader);
@@ -36,14 +35,27 @@ public class PeerInfoProperties {
 	                throw new ParseException (line, i);
 	            }
 	            final boolean hasFile = (tokens[3].trim()=="1");
-	            _peerInfoVector.add (new RemotePeerInfo(tokens[0].trim(), tokens[1].trim(),
-	                    tokens[2].trim(), hasFile));
-	            i++;
+	            RemotePeerInfo pi=new RemotePeerInfo(tokens[0].trim(), tokens[1].trim(),
+	                    tokens[2].trim(), hasFile);
+	            pi.setId(i++);
+	            allPeers.add (pi);
 	        }
 	           
 	 }
 	 
-	 public Collection<RemotePeerInfo> getPeerInfo () {
-	        return new LinkedList<>(_peerInfoVector);
+	 public static Collection<RemotePeerInfo> getPeerInfo () {
+	        return new LinkedList<>(allPeers);
 	    }
+	 public static int numberOfPeers() {
+		 return allPeers.size();
+		 
+	 }
+	 public static RemotePeerInfo getPeer(int peerid) {
+		for(RemotePeerInfo pi : allPeers) {
+			if(pi.getId()==peerid) {
+				return pi;
+			}
+		}
+		return null;
+	 }
 }
