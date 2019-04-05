@@ -114,7 +114,9 @@ public class Connection {
 	public synchronized boolean hasFile() {
 		return sharedData.hasFile();
 	}
-	
+	public synchronized void setDownloadedbytes(int n) {
+		bytesDownloaded = n;
+	}
 
 
 }
