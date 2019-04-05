@@ -155,7 +155,7 @@ public class splitFile extends Thread{
 	//we still have to add functions to write to file and getting the actual requested piece
 	
 	
-	protected BitSet getFilePieces() {
+	protected static BitSet getFilePieces() {
 		return filePieces;
 	}
 

@@ -5,10 +5,10 @@ import java.nio.ByteBuffer;
 /*
  * class to identify message types
  */
-public class Mesaage {
+public abstract class Message {
 	
 	protected ByteBuffer bytebuffer;
-	protected byte msgType;
+	protected byte msgNum;
 	protected byte[] content;
 	protected byte[] length = new byte[4];
 	protected byte[] payload;
@@ -16,4 +16,9 @@ public class Mesaage {
 	public static enum MsgType {
 		CHOKE, UNCHOKE, INTERESTED, NOTINTERESTED, HAVE, BITFIELD, REQUEST, PIECE, HANDSHAKE;
 	}
+
+	protected abstract byte[] getPayload();
+
+	protected abstract int getMessageLength(); 
+	
 }

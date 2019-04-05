@@ -16,6 +16,7 @@ import com.ufl.cise.conf.*;
  * 
  */
 public class peerProcess {
+	private static int peerId;
 
 	public static void main(String[] args) throws Exception {
 		
@@ -23,30 +24,26 @@ public class peerProcess {
 			throw new Exception("The number of arguments passed is  "+args.length+" but the required length is 1");
 			
 		}
-		final int peerId = Integer.parseInt(args[0]);
-    	String address = "localhost";
-        int port = 6008;
-	    boolean hasFile = false;
+		Peer peer = Peer.getInstance();
+		peerId = Integer.parseInt(args[0]);
 		Reader commonReader = null;
 		Reader peerReader = null;
-		Properties common =null;
 		PeerInfoProperties peerInfo = new PeerInfoProperties();
 		Collection<RemotePeerInfo> peersToConnect= new LinkedList<>();
+		
 		
 		try {
 			new LoadProperties();
 			peerReader = new FileReader(Constants.PEER_CONFIG_FILE_NAME);
 			peerInfo.read(peerReader);
-			for( RemotePeerInfo peer : peerInfo.getPeerInfo()) {
-				if(peer.getPeerId()==peerId) {
-					address= peer.getPeer_Address();
-					port = peer.getPort();
-					hasFile= peer.has_File();
-					
-					break;
-				}
-				peersToConnect.add(peer);
+			Handshake.set_Id(args[0]);
+			if((PeerInfoProperties.getPeer(peerId)).isHasFile()) {
+				splitFile sp=splitFile.getInstance();
+				sp.split();
 			}
+			peer.TCPConnections();
+			peer.connectToPeers();
+			
 			
 		}
 		catch(Exception e){
@@ -64,11 +61,11 @@ public class peerProcess {
 			
 		}
 		
-		Process proc = new Process(peerId, port, address, peerInfo.getPeerInfo(), hasFile, common);
-        proc.startProcess();
-        Thread t = new Thread (proc);
-        t.start();
+
         //connect to peers
+	}
+	public static int getPeerId() {
+		return peerId;
 	}
 
 }

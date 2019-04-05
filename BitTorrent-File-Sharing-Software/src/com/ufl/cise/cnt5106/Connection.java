@@ -2,13 +2,16 @@ package com.ufl.cise.cnt5106;
 
 import java.net.Socket;
 
-
-
 public class Connection {
 	Upload upload;
 	Download download;
 	Socket peerSocket;
 	SharedData sharedData;
+	double bytesDownloaded;
+	String remotePeerId;
+	boolean IsPeerChoked;
+	private PeerManager peerManager = PeerManager.getPeerManager();
+
 	// download yet to be written 
 	
 	public Connection(Socket peerSocket) {
@@ -47,11 +50,18 @@ public class Connection {
 		
 	}
 
-	
+	public synchronized void sendMessage(int msgLen, byte[] payload) {
+		upload.addMessage(msgLen, payload);
+	}
 
 	public void addAllConnections() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public String getRemotePeerId() {
+		// TODO Auto-generated method stub
+		return remotePeerId;
 	}
 
 	

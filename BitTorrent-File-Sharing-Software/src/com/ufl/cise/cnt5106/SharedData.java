@@ -5,8 +5,8 @@ import java.util.Calendar;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import com.ufl.cise.conf.Common;
-import com.ufl.cise.messages.Mesaage;
-import com.ufl.cise.messages.Mesaage.MsgType;
+import com.ufl.cise.messages.Message;
+import com.ufl.cise.messages.Message.MsgType;
 import com.ufl.cise.messages.MessageHandler;
 
 
@@ -74,8 +74,8 @@ public class SharedData implements Runnable{
 
 	private void processPayload(byte[] p) {
 		// TODO Auto-generated method stub
-		Mesaage.MsgType messageType = getMessageType(p[0]);
-		Mesaage.MsgType responseMessageType = null;
+		Message.MsgType messageType = getMessageType(p[0]);
+		Message.MsgType responseMessageType = null;
 		int pieceIndex = Integer.MIN_VALUE;
 		switch (messageType) {
 		//write other types like choke unchoke interested etc
@@ -91,7 +91,7 @@ public class SharedData implements Runnable{
 		
 			}
 			if (sharedFile.hasAnyPieces()) {
-				responseMessageType = Mesaage.MsgType.BITFIELD;
+				responseMessageType = Message.MsgType.BITFIELD;
 			}
 			
 			break;
@@ -107,7 +107,7 @@ public class SharedData implements Runnable{
 		 messagehandler = messagehandler.getInstance();
 		if (!isHandshakeDownloaded()) {
 			setHandshakeDownloaded();
-			return Mesaage.MsgType.HANDSHAKE;
+			return Message.MsgType.HANDSHAKE;
 		}
 		return messagehandler.getType(b);
 	}
