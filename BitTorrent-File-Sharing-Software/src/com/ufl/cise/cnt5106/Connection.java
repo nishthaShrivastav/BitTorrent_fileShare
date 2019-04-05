@@ -1,6 +1,7 @@
 package com.ufl.cise.cnt5106;
 
 import java.net.Socket;
+import java.util.BitSet;
 
 public class Connection {
 	Upload upload;
@@ -62,6 +63,11 @@ public class Connection {
 	public String getRemotePeerId() {
 		// TODO Auto-generated method stub
 		return remotePeerId;
+	}
+
+	public BitSet getPeerBitSet() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	
