@@ -159,7 +159,7 @@ public class SharedData implements Runnable{
 			 * pieceIndex
 			 */
 			pieceIndex = ByteBuffer.wrap(p, 1, 4).getInt();
-			connection.addBytesDownloaded(p.length);
+			connection.addToBytesDownloaded(p.length);
 			splitFile.setPiece(Arrays.copyOfRange(p, 1, p.length));
 			//LoggerUtil.getInstance().logDownloadedPiece(getTime(), peerProcessMain.getId(), conn.getRemotePeerId(),
 				//	pieceIndex, sharedFile.getReceivedFileSize());
