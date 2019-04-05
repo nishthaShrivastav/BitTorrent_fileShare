@@ -1,6 +1,9 @@
 package com.ufl.cise.cnt5106;
 
+import java.io.IOException;
 import java.net.Socket;
+
+
 
 public class Connection {
 	Upload upload;
@@ -13,6 +16,18 @@ public class Connection {
 	private PeerManager peerManager = PeerManager.getPeerManager();
 
 	// download yet to be written 
+	public double getBytesDownloaded() {
+		return bytesDownloaded;
+	}
+
+	protected Upload getUpload() {
+		return upload;
+	}
+
+	public synchronized void addBytesDownloaded(long value) {
+		bytesDownloaded += value;
+	}
+
 	
 	public Connection(Socket peerSocket) {
 		this.peerSocket = peerSocket;
@@ -63,7 +78,14 @@ public class Connection {
 		// TODO Auto-generated method stub
 		return remotePeerId;
 	}
-
+	public void close() {
+		try {
+			peerSocket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 	//methods wrt connection manager not written 
 }
