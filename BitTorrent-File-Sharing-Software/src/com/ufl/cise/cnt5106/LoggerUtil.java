@@ -1,0 +1,103 @@
+package com.ufl.cise.cnt5106;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.util.Calendar;
+import java.util.Iterator;
+import java.util.PriorityQueue;
+
+import com.ufl.cise.cnt5106.Constants;
+import com.ufl.cise.cnt5106.Peer;
+
+import com.ufl.cise.cnt5106.Connection;
+
+import com.ufl.cise.cnt5106.LoggerUtil;
+
+public class LoggerUtil {
+private static LoggerUtil customLogger;
+public static PrintWriter printWriter = null;
+private LoggerUtil() {
+	try {
+		System.out.println(Peer.getInstance().getPeerInfo().getPeerId());
+
+		File file = new File(Constants.PEER_LOG_FILE_PATH + Peer.getInstance().getPeerInfo().getPeerId()
+				+ Constants.PEER_LOG_FILE_EXTENSION);
+		file.getParentFile().mkdirs(); // Will create parent directories if not exists
+		file.createNewFile();
+		FileOutputStream fileOutputStream = new FileOutputStream(file, false);
+		printWriter = new PrintWriter(fileOutputStream, true);
+	} catch (Exception e) {
+		System.out.println("Error: Failed to create log file");
+	}
+}
+
+public static synchronized LoggerUtil getInstance() {
+	if (customLogger == null) {
+		customLogger = new LoggerUtil();
+	}
+	return customLogger;
+}
+
+private void writeToFile(String message) {
+	synchronized (this) {
+		printWriter.println(message);
+	}
+}
+public void logTcpConnectionTo(String peerFrom, String peerTo) {
+	writeToFile(getTime() + "Peer " + peerFrom + " makes a connection to Peer " + peerTo + ".");
+}
+
+public String getTime() {
+	return Calendar.getInstance().getTime() + ": ";
+}
+public void logTcpConnectionFrom(String peerFrom, String peerTo) {
+	writeToFile(getTime() + "Peer " + peerFrom + " is connected from Peer " + peerTo + ".");
+}
+public void logChangePreferredNeighbors(String timestamp, String peerId, PriorityQueue<Connection> peers) {
+	StringBuilder log = new StringBuilder();
+	log.append(timestamp);
+	log.append("Peer " + peerId + " has the preferred neighbors ");
+	String prefix = "";
+	Iterator<Connection> iter = peers.iterator();
+	while (iter.hasNext()) {
+		log.append(prefix);
+		prefix = ", ";
+		log.append(iter.next().getRemotePeerId());
+	}
+	writeToFile(log.toString() + ".");
+}
+public void logOptimisticallyUnchokeNeighbor(String timestamp, String source, String unchokedNeighbor) {
+	writeToFile(
+			timestamp + "Peer " + source + " has the optimistically unchoked neighbor " + unchokedNeighbor + ".");
+}
+public void logUnchokingNeighbor(String timestamp, String peerId1, String peerId2) {
+	writeToFile(timestamp + "Peer " + peerId1 + " is unchoked by " + peerId2 + ".");
+}
+public void logChokingNeighbor(String timestamp, String peerId1, String peerId2) {
+	writeToFile(timestamp + "Peer " + peerId1 + " is choked by " + peerId2 + ".");
+}
+public void logReceivedHaveMessage(String timestamp, String to, String from, int pieceIndex) {
+	writeToFile(timestamp + "Peer " + to + " received the 'have' message from " + from + " for the piece "
+			+ pieceIndex + ".");
+}
+public void logReceivedInterestedMessage(String timestamp, String to, String from) {
+	writeToFile(timestamp + "Peer " + to + " received the 'interested' message from " + from + ".");
+}
+public void logReceivedNotInterestedMessage(String timestamp, String to, String from) {
+	writeToFile(timestamp + "Peer " + to + " received the 'not interested' message from " + from + ".");
+}
+public void logDownloadedPiece(String timestamp, String to, String from, int pieceIndex, int numberOfPieces) {
+	String message = timestamp + "Peer " + to + " has downloaded the piece " + pieceIndex + " from " + from + ".";
+	message += "Now the number of pieces it has is " + numberOfPieces;
+	writeToFile(message);
+
+}
+public void logFinishedDownloading(String timestamp, String peerId) {
+	writeToFile(timestamp + "Peer " + peerId + " has downloaded the complete file.");
+}
+public void logDebug(String message) {
+	writeToFile(message);
+}
+}
+
