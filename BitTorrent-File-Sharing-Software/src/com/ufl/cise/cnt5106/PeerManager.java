@@ -51,6 +51,10 @@ public class PeerManager{
 		// TODO Auto-generated method stub
 		
 	}
+	
+	public void addToFullFileList(String pid) {
+		peersWithFullFile.add(pid);
+	}
 
 	
 	

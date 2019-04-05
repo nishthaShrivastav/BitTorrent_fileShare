@@ -153,7 +153,7 @@ public class splitFile extends Thread{
 			e.printStackTrace();
 		}
 	}
-	public synchronized void writeToFile(String peerId) {
+	public synchronized void writeToFile(int peerId) {
 		String filename = peerId + File.separatorChar+ Common.getFileName(); //path names check from constants
 		System.out.println(filename);
 		FileOutputStream fos = null;
@@ -182,7 +182,7 @@ public class splitFile extends Thread{
 		requestedPieces.remove(connection);
 	}
 	
-	protected BitSet getFilePieces() {
+	protected static BitSet getFilePieces() {
 		return filePieces;
 	}
 

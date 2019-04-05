@@ -95,5 +95,25 @@ public class Connection {
 		return null;
 	}
 
+	public void removeRequestedPiece() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void addInterestedConnection() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void addNotInterestedConnection() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void tellAllNeighbors(int pieceIndex) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }
