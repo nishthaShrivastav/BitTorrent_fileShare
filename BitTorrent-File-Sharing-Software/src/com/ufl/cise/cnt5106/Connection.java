@@ -46,7 +46,7 @@ public class Connection {
 		upload = new Upload(peerSocket, peerId, sharedData);
 		download = new Download(peerSocket, peerId, sharedData);
 		createThreads(upload, download);
-		//LoggerUtil.getInstance().logTcpConnectionTo(Peer.getInstance().getNetwork().getPeerId(), peerId);
+		LoggerUtil.getInstance().logTcpConnectionTo(Peer.getInstance().getPeerInfo().getPeerId(), peerId);
 		sharedData.sendHandshake();
 		sharedData.setUpload(upload);
 		sharedData.run();

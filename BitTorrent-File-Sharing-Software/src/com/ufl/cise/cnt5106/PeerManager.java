@@ -56,8 +56,8 @@ public class PeerManager{
 						connT.setDownloadedbytes(0);
 					}
 					payloadProcess.addMessage(new Object[] { conn, Message.MsgType.CHOKE, Integer.MIN_VALUE });
-					//LoggerUtil.getInstance().logChangePreferredNeighbors(getTime(), peerProcess.getPeerId(),prefNeighbors);
-					// System.out.println("Choking:" + conn.getRemotePeerId());
+					LoggerUtil.getInstance().logChangePreferredNeighbors(getTime(), peerProcess.getPeerId(),prefNeighbors);
+					 System.out.println("Choking:" + conn.getRemotePeerId());
 				}
 			}
 			
