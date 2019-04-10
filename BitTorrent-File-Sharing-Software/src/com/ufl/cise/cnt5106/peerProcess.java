@@ -19,21 +19,20 @@ public class peerProcess {
 	private static int peerId;
 
 	public static void main(String[] args) throws Exception {
-		
+
 		if(args.length!=1) {
 			throw new Exception("The number of arguments passed is  "+args.length+" but the required length is 1");
-			
+
 		}
-		
+
 		peerId = Integer.parseInt(args[0]);
 		Reader peerReader = null;
 		PeerInfoProperties peerInfo = new PeerInfoProperties();
 		Collection<RemotePeerInfo> peersToConnect= new LinkedList<>();
-		
-		
+
 		try {
 			new LoadProperties();
-			peerReader = new FileReader(Constants.PROPERTIES_FILE_PATH+Constants.PEER_CONFIG_FILE_NAME);
+			peerReader = new FileReader(Constants.SOURCE_FILE_PATH+Constants.PEER_CONFIG_FILE_NAME);
 			peerInfo.read(peerReader);
 			Handshake.set_Id(args[0]);
 			if((PeerInfoProperties.getPeer(peerId)).hasFile()) {
@@ -43,8 +42,8 @@ public class peerProcess {
 			Peer peer = Peer.getInstance();
 			peer.TCPConnections();
 			peer.connectToPeers();
-			
-			
+
+
 		}
 		catch(Exception e){
 			e.printStackTrace();
@@ -56,9 +55,9 @@ public class peerProcess {
 			catch(Exception e) {
 				e.printStackTrace();
 			}
-			
+
 		}
-        //connect to peers
+		//connect to peers
 	}
 	public static int getPeerId() {
 		return peerId;

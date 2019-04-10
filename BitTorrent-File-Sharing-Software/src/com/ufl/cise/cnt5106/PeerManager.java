@@ -42,12 +42,10 @@ public class PeerManager{
 	}
 	
 	private void monitor() {
-	// TODO Auto-generated method stub
 		new Timer().scheduleAtFixedRate(new TimerTask() {
 
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				if (peersWithFullFile.size() == num_peers - 1 && splitFile.isCompleteFile()) {
 					System.exit(0);
 				}
@@ -112,7 +110,6 @@ public class PeerManager{
 	}
 
 	public synchronized void addAllConnections(Connection connection) {
-		// TODO Auto-generated method stub
 		allConnections.add(connection);
 	}
 

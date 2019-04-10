@@ -27,7 +27,6 @@ public class Upload implements Runnable {
 		init(socket, data);
 	}
 	private void init(Socket client, SharedData data) {
-		// TODO Auto-generated method stub
 		uploadPayloadQueue = new LinkedBlockingQueue<>();
 		uploadLengthQueue = new LinkedBlockingQueue<>();
 		isAlive = true;
@@ -36,7 +35,6 @@ public class Upload implements Runnable {
 		try {
 			out = new DataOutputStream(socket.getOutputStream());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -45,7 +43,6 @@ public class Upload implements Runnable {
 	
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
 		while (isAlive) {
 			try {
 				int messageLength = uploadLengthQueue.take();
@@ -68,7 +65,6 @@ public class Upload implements Runnable {
 			uploadLengthQueue.put(length);
 			uploadPayloadQueue.put(payload);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

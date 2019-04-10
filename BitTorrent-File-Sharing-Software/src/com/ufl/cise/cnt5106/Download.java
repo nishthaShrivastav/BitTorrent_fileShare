@@ -23,14 +23,12 @@ public class Download implements Runnable {
 	}
 
 	private void init(Socket socket, SharedData data) {
-		// TODO Auto-generated method stub
 		this.socket = socket;
 		sharedData = data;
 		isAlive = true;
 		try {
 			in = new DataInputStream(socket.getInputStream());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -38,13 +36,11 @@ public class Download implements Runnable {
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
 		recvmsg();
 		
 	}
 
 	private void recvmsg() {
-		// TODO Auto-generated method stub
 		while (isAlive()) {
 		
 			int messageLength = Integer.MIN_VALUE;
@@ -61,27 +57,23 @@ public class Download implements Runnable {
 	}
 
 	private void receiveMessagePayload(byte[] payload) {
-		// TODO Auto-generated method stub
 		receiveRawData(payload);
 		
 	}
 
 	private int receiveMessageLength() {
-		// TODO Auto-generated method stub
 		int len = Integer.MIN_VALUE;
 		byte[] messageLength = new byte[4];
 		try {
 			receiveRawData(messageLength);
 			len = ByteBuffer.wrap(messageLength).getInt();
 		} catch (Exception e) {
-			// isAlive = false;
 			e.printStackTrace();
 		}
 		return len;
 		
 	}
 	private void receiveRawData(byte[] messageLength) {
-		// TODO Auto-generated method stub
 		try {
 			in.readFully(messageLength);
 		} catch (EOFException e) {
@@ -92,7 +84,6 @@ public class Download implements Runnable {
 	}
 
 	private synchronized boolean isAlive() {
-		// TODO Auto-generated method stub
 		return isAlive;
 	}
 

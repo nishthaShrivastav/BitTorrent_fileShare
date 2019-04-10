@@ -54,7 +54,8 @@ public class splitFile extends Thread{
 		file = new ConcurrentHashMap<Integer, byte[]>();
 		filePieces = new BitSet(Common.getNumberOfPieces());
 		try {
-			File createdFile = new File(Constants.COMMON_PROPERTIES_CREATED_FILE_PATH + Common.getFileName());
+			File createdFile = new File(Constants.CREATED_FILE_PATH + peerProcess.getPeerId()
+			+ File.separatorChar + Common.getFileName());
 			createdFile.getParentFile().mkdirs(); // Will create parent directories if not exists
 			createdFile.createNewFile();
 			writeFileChannel = FileChannel.open(createdFile.toPath(), StandardOpenOption.WRITE);
@@ -64,7 +65,7 @@ public class splitFile extends Thread{
 		}
 	}
 	public void split() {
-		File filePtr = new File(Constants.COMMON_PROPERTIES_CREATED_FILE_PATH+Common.getFileName()); //add path to the file
+		File filePtr = new File(Constants.SOURCE_FILE_PATH+Common.getFileName()); //add path to the file
 		FileInputStream fis = null;
 		DataInputStream dis = null;
 		int fileSize = (int) Common.getFileSize();
@@ -126,7 +127,6 @@ public class splitFile extends Thread{
 
 
 	public boolean hasAnyPieces() {
-		// TODO Auto-generated method stub
 		return filePieces.nextSetBit(0) != -1;
 	}
 	
@@ -138,7 +138,6 @@ public class splitFile extends Thread{
 				int pieceIndex = ByteBuffer.wrap(payload, 0, 4).getInt();
 
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -151,7 +150,6 @@ public class splitFile extends Thread{
 		try {
 			fileQueue.put(payload);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

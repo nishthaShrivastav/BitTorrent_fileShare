@@ -69,7 +69,7 @@ public class Connection {
 	}
 
 	public void addAllConnections() {
-		//peerManager.addAllConnections(this);
+		peerManager.addAllConnections(this);
 		
 	}
 
@@ -99,16 +99,16 @@ public class Connection {
 	}
 
 	public void addInterestedConnection() {
-		//peerManager.addInterestedConnection(remotePeerId, this);
+		peerManager.addInterestedConnection(remotePeerId, this);
 		
 	}
 
 	public void addNotInterestedConnection() {
-		//peerManager.addNotInterestedConnection(remotePeerId, this);
+		peerManager.addNotInterestedConnection(remotePeerId, this);
 	}
 
 	public void tellAllNeighbors(int pieceIndex) {
-		//peerManager.tellAllNeighbors(pieceIndex);
+		peerManager.tellAllNeighbors(pieceIndex);
 		
 	}
 	public synchronized boolean hasFile() {

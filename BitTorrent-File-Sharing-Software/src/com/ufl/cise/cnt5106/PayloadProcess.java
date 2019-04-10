@@ -34,6 +34,7 @@ public class PayloadProcess extends Thread {
 			queue.put(input);
 		} catch (InterruptedException e) {
 			System.out.println("Exception in addMessage PayloadProcess"+e);
+			e.printStackTrace();
 		}
 	}
 
