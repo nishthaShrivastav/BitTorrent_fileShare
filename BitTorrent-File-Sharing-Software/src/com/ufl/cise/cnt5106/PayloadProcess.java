@@ -21,7 +21,7 @@ public class PayloadProcess extends Thread {
 		connection = null;
 		piece_index = Integer.MIN_VALUE;
 	}
-	protected static synchronized PayloadProcess getInstance() {
+	public static synchronized PayloadProcess getInstance() {
 		if (payloadProcess == null) {
 			payloadProcess = new PayloadProcess();
 			payloadProcess.start();
@@ -41,6 +41,7 @@ public class PayloadProcess extends Thread {
 	@Override
 	public void run() {
 		while (true) {
+			System.out.println("PayloadProcess run started");
 			Object[] input = retrieveMessage();
 			connection = (Connection) input[0];
 			msgType = (Message.MsgType) input[1];
@@ -57,7 +58,9 @@ public class PayloadProcess extends Thread {
 	private Object[] retrieveMessage() {
 		Object[] input = null;
 		try {
+			System.out.println("payloadprocess waiting on queue");
 			input = queue.take();
+			System.out.println("Payloadprocess popped from queue");
 		} catch (InterruptedException e) {
 			System.out.println("Exception in retreiveMessage PayloadProcess"+e);
 		}

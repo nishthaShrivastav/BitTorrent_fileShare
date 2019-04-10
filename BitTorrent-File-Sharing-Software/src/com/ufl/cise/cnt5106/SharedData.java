@@ -17,6 +17,7 @@ public class SharedData implements Runnable{
 	
 	private LinkedBlockingQueue<byte[]> payloadQueue;
 	private boolean isAlive;
+	private Peer host = Peer.getInstance();
 	private String remotePeerId;
 	private splitFile splitFile;
 	private BitSet peerBitset;
@@ -79,7 +80,7 @@ public class SharedData implements Runnable{
 	}
 	
 
-	private boolean getUploadHandshake() {
+	public synchronized boolean getUploadHandshake() {
 		return uploadHandshake; 
 	}
 
@@ -91,27 +92,26 @@ public class SharedData implements Runnable{
 		int pieceIndex = Integer.MIN_VALUE;
 		switch (msgType) {
 		case CHOKE:
-			//LoggerUtil.getInstance().logChokingNeighbor(getTime(), peerProcessMain.getId(), conn.getRemotePeerId());
+			LoggerUtil.getInstance().logChokingNeighbor(getTime(), peerProcess.getPeerId(), connection.getRemotePeerId());
 			connection.removeRequestedPiece();
 			responseMsgType = null;
 			break;
 		case UNCHOKE:
 			// respond with request
-			//LoggerUtil.getInstance().logUnchokingNeighbor(getTime(), peerProcessMain.getId(), conn.getRemotePeerId());
+			LoggerUtil.getInstance().logUnchokingNeighbor(getTime(), peerProcess.getPeerId(), connection.getRemotePeerId());
 			responseMsgType = MsgType.REQUEST;
 			pieceIndex = splitFile.getRequestPieceIndex(connection);
 			break;
 		case INTERESTED:
 			// add to interested connections
-			//LoggerUtil.getInstance().logReceivedInterestedMessage(getTime(), peerProcessMain.getId(),
-			//		conn.getRemotePeerId());
+			LoggerUtil.getInstance().logReceivedInterestedMessage(getTime(), peerProcess.getPeerId(),connection.getRemotePeerId());
 			connection.addInterestedConnection();
 			responseMsgType = null;
 			break;
 		case NOTINTERESTED:
 			// add to not interested connections
-			//LoggerUtil.getInstance().logReceivedNotInterestedMessage(getTime(), peerProcessMain.getId(),
-			//		conn.getRemotePeerId());
+			LoggerUtil.getInstance().logReceivedNotInterestedMessage(getTime(), peerProcess.getPeerId(),
+					connection.getRemotePeerId());
 			connection.addNotInterestedConnection();
 			responseMsgType = null;
 			break;
@@ -119,8 +119,8 @@ public class SharedData implements Runnable{
 			// update peer bitset
 			// send interested/not interested
 			pieceIndex = ByteBuffer.wrap(p, 1, 4).getInt();
-			//LoggerUtil.getInstance().logReceivedHaveMessage(getTime(), peerProcessMain.getId(), conn.getRemotePeerId(),
-				//	pieceIndex);
+			LoggerUtil.getInstance().logReceivedHaveMessage(getTime(), peerProcess.getPeerId(), connection.getRemotePeerId(),
+					pieceIndex);
 			updatePeerBitset(pieceIndex);
 			if(isInterested()) {
 				responseMsgType= MsgType.INTERESTED;
@@ -161,13 +161,13 @@ public class SharedData implements Runnable{
 			pieceIndex = ByteBuffer.wrap(p, 1, 4).getInt();
 			connection.addToBytesDownloaded(p.length);
 			splitFile.setPiece(Arrays.copyOfRange(p, 1, p.length));
-			//LoggerUtil.getInstance().logDownloadedPiece(getTime(), peerProcessMain.getId(), conn.getRemotePeerId(),
-				//	pieceIndex, sharedFile.getReceivedFileSize());
+			LoggerUtil.getInstance().logDownloadedPiece(getTime(), peerProcess.getPeerId(), connection.getRemotePeerId(),
+				pieceIndex, splitFile.getReceivedFileSize());
 			responseMsgType = MsgType.REQUEST;
 			connection.tellAllNeighbors(pieceIndex);
 			pieceIndex = splitFile.getRequestPieceIndex(connection);
 			if (pieceIndex == Integer.MIN_VALUE) {
-				//LoggerUtil.getInstance().logFinishedDownloading(getTime(), peerProcessMain.getId());
+				LoggerUtil.getInstance().logFinishedDownloading(getTime(), peerProcess.getPeerId());
 				splitFile.writeToFile(peerProcess.getPeerId());
 				msgType = null;
 				isAlive = false;
@@ -179,17 +179,19 @@ public class SharedData implements Runnable{
 			remotePeerId = Handshake.get_Id(p);
 			connection.setPeerId(remotePeerId);
 			connection.addAllConnections();
-			// System.out.println("Handshake: " + responseMessageType);
 			if (!getUploadHandshake()) {
 				setUploadHandshake();
-				//LoggerUtil.getInstance().logTcpConnectionFrom(host.getNetwork().getPeerId(), remotePeerId);
+				LoggerUtil.getInstance().logTcpConnectionFrom(host.getPeerInfo().getPeerId(), remotePeerId);
 				payloadProcess.addMessage(new Object[] { connection, MsgType.HANDSHAKE, Integer.MIN_VALUE });
-				// System.out.println("Added " + messageType + " to broadcaster");
 			}
 			if (splitFile.hasAnyPieces()) {
 				responseMsgType = MsgType.BITFIELD;
 			}
 			break;
+		}
+		if (null != responseMsgType) {
+			
+			payloadProcess.addMessage(new Object[] { connection, responseMsgType, pieceIndex });
 		}
 		
 	}

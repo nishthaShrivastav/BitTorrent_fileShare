@@ -41,6 +41,7 @@ public class peerProcess {
 				sp.split();
 			}
 			Peer peer = Peer.getInstance();
+			System.out.println("Peer "+peerId+" starting connections");
 			peer.TCPConnections();
 			peer.connectToPeers();
 

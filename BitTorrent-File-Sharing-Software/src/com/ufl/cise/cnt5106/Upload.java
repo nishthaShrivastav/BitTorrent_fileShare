@@ -31,9 +31,9 @@ public class Upload implements Runnable {
 		uploadLengthQueue = new LinkedBlockingQueue<>();
 		isAlive = true;
 		this.socket = socket;
-		// sharedData = data;
 		try {
 			out = new DataOutputStream(socket.getOutputStream());
+			System.out.println("Created output data stream for "+client.getPort());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -44,6 +44,7 @@ public class Upload implements Runnable {
 	@Override
 	public void run() {
 		while (isAlive) {
+			System.out.println("Upoad run started");
 			try {
 				int messageLength = uploadLengthQueue.take();
 				out.writeInt(messageLength);

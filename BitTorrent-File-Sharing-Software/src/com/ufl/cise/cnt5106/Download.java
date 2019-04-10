@@ -36,11 +36,8 @@ public class Download implements Runnable {
 
 	@Override
 	public void run() {
-		recvmsg();
-		
-	}
+		System.out.println("Downoad run started");
 
-	private void recvmsg() {
 		while (isAlive()) {
 		
 			int messageLength = Integer.MIN_VALUE;
@@ -53,7 +50,7 @@ public class Download implements Runnable {
 			sharedData.addPayload(payload);
 			
 		}
-		
+	
 	}
 
 	private void receiveMessagePayload(byte[] payload) {

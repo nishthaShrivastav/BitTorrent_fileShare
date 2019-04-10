@@ -2,7 +2,9 @@ package com.ufl.cise.messages;
 
 import java.nio.ByteBuffer;
 
+import com.ufl.cise.cnt5106.Bitfield;
 import com.ufl.cise.cnt5106.Handshake;
+import com.ufl.cise.cnt5106.splitFile;
 import com.ufl.cise.messages.Message.MsgType;
 
 /*
@@ -14,8 +16,16 @@ import com.ufl.cise.messages.Message.MsgType;
 
 public class MessageHandler {
 	public static MessageHandler messageHandler;
-
+	private splitFile splitFie;
+	
+	
+	private MessageHandler() {
+		splitFile.getInstance();
+	}
 	public static synchronized MessageHandler getInstance() {
+		if(messageHandler==null) {
+			messageHandler=new MessageHandler();
+		}
 
 		return messageHandler;
 
@@ -49,20 +59,19 @@ public class MessageHandler {
 		case INTERESTED:
 		case NOTINTERESTED:
 			return 1;
-		
+		case REQUEST:
 		case HAVE:
 			return 5;
 		case BITFIELD:
-			// write bitfield case
-			return 0;
-		case REQUEST:
-			return 5;
+			Bitfield bitfield = Bitfield.getInstance();
+			return bitfield.getMessageLength();
 		case HANDSHAKE:
 			return 32;
 		case PIECE:
-			//write piece case
-			return 0;
-
+			if(splitFile.getPiece(pieceIndex) !=null) {
+				int payloadLength = 5 + splitFile.getPiece(pieceIndex).length;
+				return payloadLength;
+			}
 		}
 		return -1;
 	}
@@ -82,7 +91,8 @@ public class MessageHandler {
 			System.arraycopy(pieceInd, 0, payload, 1, 4);
 			break;
 		case BITFIELD:
-			//write payload case
+			Bitfield bitfield = Bitfield.getInstance();
+			payload = bitfield.getPayload();
 		case REQUEST:
 			payload[0] = 6;
 			byte[] index = ByteBuffer.allocate(4).putInt(pieceIndex).array();
@@ -91,9 +101,15 @@ public class MessageHandler {
 		case HANDSHAKE:
 			return Handshake.message_get();
 		case PIECE:
-			//get piece from file and return array 
-			return payload;
-
+			byte[] piece = splitFile.getPiece(pieceIndex);
+			int pieceSize = piece.length;
+			int totalLength = 5 + pieceSize;
+			payload = new byte[totalLength];
+			payload[0] = 7;
+			byte[] data = ByteBuffer.allocate(4).putInt(pieceIndex).array();
+			System.arraycopy(data, 0, payload, 1, 4);
+			System.arraycopy(piece, 0, payload, 5, pieceSize);
+			break;
 		}
 		return payload;
 		

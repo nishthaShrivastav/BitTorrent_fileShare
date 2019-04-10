@@ -38,13 +38,13 @@ public class Bitfield extends Message {
 		}
 
 		@Override
-		protected synchronized int getMessageLength() {
+		public synchronized int getMessageLength() {
 			getBitfield();
 			return payload.length;
 		}
 
 		@Override
-		protected synchronized byte[] getPayload() {
+		public synchronized byte[] getPayload() {
 			return payload;
 		}
 

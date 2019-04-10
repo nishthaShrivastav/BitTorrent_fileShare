@@ -58,6 +58,7 @@ public class Peer {
 				new Thread() {
 					@Override
 					public void run() {
+						System.out.println("Starting connection with"+pi.getHostName());
 						createPeerConnection(pi);
 					}
 				}.start();
@@ -73,6 +74,7 @@ public class Peer {
 		String peerHost= pi.getHostName();
 		try {
 			Socket socket = new Socket(peerHost, peerPort);
+			System.out.println("created socket for"+pi.getHostName());
 			peerManager.createConnection(socket);
 			Thread.sleep(300);
 		}

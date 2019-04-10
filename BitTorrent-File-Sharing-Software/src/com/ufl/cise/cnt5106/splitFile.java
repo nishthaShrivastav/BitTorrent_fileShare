@@ -109,7 +109,7 @@ public class splitFile extends Thread{
 		}
 }// end split function
 	
-	public synchronized byte[] getPiece(int index) {
+	public synchronized static byte[] getPiece(int index) {
 		return file.get(index);
 	}
 	
@@ -182,12 +182,12 @@ public class splitFile extends Thread{
 		requestedPieces.remove(connection);
 	}
 	
-	protected static BitSet getFilePieces() {
+	public static BitSet getFilePieces() {
 		return filePieces;
 	}
 
 
-	protected synchronized int getRequestPieceIndex(Connection conn) {
+	public synchronized int getRequestPieceIndex(Connection conn) {
 		if (isCompleteFile()) {
 			System.out.println("File received");
 			return Integer.MIN_VALUE;
@@ -207,5 +207,6 @@ public class splitFile extends Thread{
 		return missingPieces[new Random().nextInt(missingPieces.length)];
 		
 	}
+	
 
 }
