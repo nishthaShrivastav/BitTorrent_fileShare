@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.BitSet;
 
-
-
 public class Connection {
 	Upload upload;
 	Download download;
@@ -13,7 +11,7 @@ public class Connection {
 	SharedData sharedData;
 	double bytesDownloaded;
 	String remotePeerId;
-	boolean IsPeerChoked;
+	boolean isPeerChoked;
 	private PeerManager peerManager = PeerManager.getPeerManager();
 
 	// download yet to be written 
@@ -25,10 +23,12 @@ public class Connection {
 		return upload;
 	}
 
-	public synchronized void addBytesDownloaded(long value) {
+	public synchronized void addToBytesDownloaded(long value) {
 		bytesDownloaded += value;
 	}
-
+	public boolean isPeerChoked() {
+		return isPeerChoked;
+	}
 	
 	public Connection(Socket peerSocket) {
 		this.peerSocket = peerSocket;
@@ -39,31 +39,29 @@ public class Connection {
 		sharedData.setUpload(upload);
 		sharedData.run();
 	}
-
+	
+	public Connection(Socket peerSocket, String peerId) {
+		this.peerSocket = peerSocket;
+		sharedData = new SharedData(this);
+		upload = new Upload(peerSocket, peerId, sharedData);
+		download = new Download(peerSocket, peerId, sharedData);
+		createThreads(upload, download);
+		//LoggerUtil.getInstance().logTcpConnectionTo(Peer.getInstance().getNetwork().getPeerId(), peerId);
+		sharedData.sendHandshake();
+		sharedData.setUpload(upload);
+		sharedData.run();
+	}
 	private void createThreads(Upload upload, Download download) {
-		// TODO Auto-generated method stub
 		Thread uploadThread = new Thread(upload);
 		Thread downloadThread = new Thread(download);
 		uploadThread.start();
 		downloadThread.start();
 		
 	}
-
-	public Connection(Socket peerSocket, String peerId) {
-		this.peerSocket = peerSocket;
-		sharedData = new SharedData(this);
-		upload = new Upload(peerSocket, peerId, sharedData);
-		download= new Download(peerSocket,sharedData);
-		createThreads(upload, download);
-		//create Log
-		sharedData.sendHandshake();
-		sharedData.setUpload(upload);
-		sharedData.run();
-	}
-
-	public void setPeerId(String remotePeerId) {
-		// TODO Auto-generated method stub
-		
+	
+	
+	public void setPeerId(String val) {
+		remotePeerId=val;
 	}
 
 	public synchronized void sendMessage(int msgLen, byte[] payload) {
@@ -71,12 +69,11 @@ public class Connection {
 	}
 
 	public void addAllConnections() {
-		// TODO Auto-generated method stub
+		//peerManager.addAllConnections(this);
 		
 	}
 
 	public String getRemotePeerId() {
-		// TODO Auto-generated method stub
 		return remotePeerId;
 	}
 
@@ -84,15 +81,41 @@ public class Connection {
 		try {
 			peerSocket.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Exception in Connection close"+e);
 		}
 	}
 
+	
+	protected synchronized void addRequestedPiece(int pieceIndex) {
+		splitFile.getInstance().addRequestedPiece(this, pieceIndex);
+	}
 
 	public BitSet getPeerBitSet() {
-		// TODO Auto-generated method stub
-		return null;
+		return sharedData.getPeerBitSet();
+	}
+
+	public void removeRequestedPiece() {
+		splitFile.getInstance().removeRequestedPiece(this);
+	}
+
+	public void addInterestedConnection() {
+		//peerManager.addInterestedConnection(remotePeerId, this);
+		
+	}
+
+	public void addNotInterestedConnection() {
+		//peerManager.addNotInterestedConnection(remotePeerId, this);
+	}
+
+	public void tellAllNeighbors(int pieceIndex) {
+		//peerManager.tellAllNeighbors(pieceIndex);
+		
+	}
+	public synchronized boolean hasFile() {
+		return sharedData.hasFile();
+	}
+	public synchronized void setDownloadedbytes(int n) {
+		bytesDownloaded = n;
 	}
 
 
