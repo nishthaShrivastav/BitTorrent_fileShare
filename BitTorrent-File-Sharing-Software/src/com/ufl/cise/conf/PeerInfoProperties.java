@@ -34,7 +34,7 @@ public class PeerInfoProperties {
 	            if (tokens.length != 4) {
 	                throw new ParseException (line, i);
 	            }
-	            final boolean hasFile = (tokens[3].trim()=="1");
+	            final boolean hasFile = (tokens[3].trim().equalsIgnoreCase("1"));
 	            RemotePeerInfo pi=new RemotePeerInfo(tokens[0].trim(), tokens[1].trim(),
 	                    tokens[2].trim(), hasFile);
 	            pi.setId(i++);
@@ -51,11 +51,16 @@ public class PeerInfoProperties {
 		 
 	 }
 	 public static RemotePeerInfo getPeer(int peerid) {
-		for(RemotePeerInfo pi : allPeers) {
-			if(pi.getId()==peerid) {
-				return pi;
-			}
-		}
-		return null;
+		 for(RemotePeerInfo pi : allPeers) {
+			 try {
+				 if(Integer.parseInt(pi.getPeerId())==peerid) {
+					 return pi;
+				 }
+			 }
+			 catch(NumberFormatException e) {
+				 e.printStackTrace();
+			 }
+		 }
+		 return null;
 	 }
 }

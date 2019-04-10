@@ -59,7 +59,7 @@ public class RemotePeerInfo{
 			this.peerPort = peerPort;
 		}
 
-		public boolean isHasFile() {
+		public boolean hasFile() {
 			return hasFile;
 		}
 

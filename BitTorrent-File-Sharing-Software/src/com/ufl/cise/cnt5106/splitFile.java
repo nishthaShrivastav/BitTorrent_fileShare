@@ -17,6 +17,7 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import com.ufl.cise.conf.Common;
+
 /*
  * file created to split the file into pieces 
  * run method yet to be written
@@ -41,7 +42,7 @@ public class splitFile extends Thread{
 	
 	}
 	
-	public static synchronized splitFile getInstance() {
+	public synchronized static splitFile getInstance() {
 		if (split==null) {
 			split = new splitFile();
 			split.start();
@@ -53,7 +54,7 @@ public class splitFile extends Thread{
 		file = new ConcurrentHashMap<Integer, byte[]>();
 		filePieces = new BitSet(Common.getNumberOfPieces());
 		try {
-			File createdFile = new File(peerProcess.getPeerId()+ File.separatorChar + Common.getFileName());
+			File createdFile = new File(Constants.COMMON_PROPERTIES_CREATED_FILE_PATH + Common.getFileName());
 			createdFile.getParentFile().mkdirs(); // Will create parent directories if not exists
 			createdFile.createNewFile();
 			writeFileChannel = FileChannel.open(createdFile.toPath(), StandardOpenOption.WRITE);
@@ -63,7 +64,7 @@ public class splitFile extends Thread{
 		}
 	}
 	public void split() {
-		File filePtr = new File(Common.getFileName()); //add path to the file
+		File filePtr = new File(Constants.COMMON_PROPERTIES_CREATED_FILE_PATH+Common.getFileName()); //add path to the file
 		FileInputStream fis = null;
 		DataInputStream dis = null;
 		int fileSize = (int) Common.getFileSize();
@@ -91,6 +92,7 @@ public class splitFile extends Thread{
 				}//end for		
 			}catch(IOException fileReadError) {
 			System.out.println("Error while splitting file");
+			fileReadError.printStackTrace();
 		}
 	}
 		catch (FileNotFoundException e) {

@@ -16,7 +16,7 @@ public class LoadProperties {
 	public void load() {
 		Properties properties = new Properties();
 		try {
-			FileInputStream in = new FileInputStream(Constants.CONFIG_FILE_NAME);
+			FileInputStream in = new FileInputStream(Constants.PROPERTIES_FILE_PATH+Constants.CONFIG_FILE_NAME);
 			properties.load(in);
 		} catch (IOException e) {
 			System.out.println("Config file not found");
