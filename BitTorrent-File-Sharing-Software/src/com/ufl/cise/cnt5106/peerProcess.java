@@ -32,6 +32,7 @@ public class peerProcess {
 
 		try {
 			new LoadProperties();
+			
 			peerReader = new FileReader(Constants.SOURCE_FILE_PATH+Constants.PEER_CONFIG_FILE_NAME);
 			peerInfo.read(peerReader);
 			Handshake.set_Id(args[0]);
