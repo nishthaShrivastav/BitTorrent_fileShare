@@ -1,5 +1,6 @@
 package com.ufl.cise.conf;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -16,7 +17,7 @@ public class LoadProperties {
 	public void load() {
 		Properties properties = new Properties();
 		try {
-			FileInputStream in = new FileInputStream(Constants.PROPERTIES_FILE_PATH+Constants.CONFIG_FILE_NAME);
+			FileInputStream in = new FileInputStream(System.getProperty("user.dir")+File.separatorChar+"src"+ File.separatorChar+Constants.CONFIG_FILE_NAME);
 			properties.load(in);
 		} catch (IOException e) {
 			System.out.println("Config file not found");

@@ -22,7 +22,7 @@ private LoggerUtil() {
 		System.out.println(Peer.getInstance().getPeerInfo().getPeerId());
 
 		File file = new File(Constants.PEER_LOG_FILE_PATH + Peer.getInstance().getPeerInfo().getPeerId()
-				+ Constants.PEER_LOG_FILE_EXTENSION);
+			+ Constants.PEER_LOG_FILE_EXTENSION);
 		file.getParentFile().mkdirs(); // Will create parent directories if not exists
 		file.createNewFile();
 		FileOutputStream fileOutputStream = new FileOutputStream(file, false);

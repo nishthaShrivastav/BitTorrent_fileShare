@@ -30,10 +30,9 @@ public class peerProcess {
 		PeerInfoProperties peerInfo = new PeerInfoProperties();
 		Collection<RemotePeerInfo> peersToConnect= new LinkedList<>();
 		
-		
 		try {
 			new LoadProperties();
-			peerReader = new FileReader(Constants.PROPERTIES_FILE_PATH+Constants.PEER_CONFIG_FILE_NAME);
+			peerReader = new FileReader(System.getProperty("user.dir")+File.separatorChar+"src"+ File.separatorChar+Constants.PEER_CONFIG_FILE_NAME);
 			peerInfo.read(peerReader);
 			Handshake.set_Id(args[0]);
 			if((PeerInfoProperties.getPeer(peerId)).hasFile()) {
