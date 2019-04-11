@@ -78,13 +78,15 @@ public class MessageHandler {
 	
 	public synchronized byte[] getPayload(MsgType messageType, int pieceIndex) {
 		byte[] payload = new byte[5];
-		byte[] nopayload = new byte[1];
 		switch(messageType) {
 		case CHOKE:
+			return new byte[] { 0 };
 		case UNCHOKE:
+			return new byte[] { 1 };
 		case INTERESTED:
+			return new byte[] { 2 };
 		case NOTINTERESTED:
-			return nopayload;
+			return new byte[] { 3 };
 		case HAVE:
 			payload[0] = 4;
 			byte[] pieceInd = ByteBuffer.allocate(4).putInt(pieceIndex).array();
@@ -93,6 +95,7 @@ public class MessageHandler {
 		case BITFIELD:
 			Bitfield bitfield = Bitfield.getInstance();
 			payload = bitfield.getPayload();
+			break;
 		case REQUEST:
 			payload[0] = 6;
 			byte[] index = ByteBuffer.allocate(4).putInt(pieceIndex).array();

@@ -68,7 +68,6 @@ public class Download implements Runnable {
 	}
 	private void receiveRawData(byte[] messageLength) {
 		try {
-			System.out.println("reading from socket in "+Thread.currentThread().getName());
 			in.readFully(messageLength);
 		} catch (EOFException e) {
 			System.exit(0);

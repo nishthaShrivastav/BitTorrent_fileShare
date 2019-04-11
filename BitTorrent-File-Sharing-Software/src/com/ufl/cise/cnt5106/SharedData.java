@@ -88,10 +88,11 @@ public class SharedData implements Runnable{
 
 
 	private void processPayload(byte[] p) {
+		System.out.println("payload[0]= "+p[0]);
 		MsgType msgType = getMessageType(p[0]);
 		MsgType responseMsgType = null;
 		int pieceIndex = Integer.MIN_VALUE;
-		System.out.println("message type"+msgType);
+		System.out.println("Shareddata processPayload message received:"+msgType);
 		switch (msgType) {
 		case CHOKE:
 			LoggerUtil.getInstance().logChokingNeighbor(getTime(), peerProcess.getPeerId(), connection.getRemotePeerId());

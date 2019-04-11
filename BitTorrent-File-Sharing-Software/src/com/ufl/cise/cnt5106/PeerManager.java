@@ -27,8 +27,6 @@ public class PeerManager{
 	private splitFile splitFile;
 	private PayloadProcess payloadProcess;
 	
-	
-	
 	private PeerManager() {
 
 		uninterested = new HashSet<>();
@@ -37,7 +35,7 @@ public class PeerManager{
 		payloadProcess = PayloadProcess.getInstance();
 		splitFile =splitFile.getInstance();
 		allConnections = new HashSet<>();
-		monitor();
+		//monitor();
 	
 	}
 	

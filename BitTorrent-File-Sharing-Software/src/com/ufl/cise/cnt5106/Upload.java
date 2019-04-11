@@ -42,7 +42,6 @@ public class Upload implements Runnable {
 		while (isAlive) {
 			System.out.println("Upload run started");
 			try {
-				System.out.println("waiting on upload queue in "+Thread.currentThread().getName());
 				int messageLength = uploadLengthQueue.take();
 				out.writeInt(messageLength);
 				out.flush();
@@ -62,6 +61,7 @@ public class Upload implements Runnable {
 	public void addMessage(int length, byte[] payload) {
 		try {
 			uploadLengthQueue.put(length);
+			System.out.println("payload[0] sending form upload thread"+payload[0]);
 			uploadPayloadQueue.put(payload);
 		} catch (InterruptedException e) {
 			e.printStackTrace();

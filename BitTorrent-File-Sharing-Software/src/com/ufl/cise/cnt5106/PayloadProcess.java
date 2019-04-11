@@ -51,7 +51,7 @@ public class PayloadProcess extends Thread {
 			int messageLength = messageHandler.getMessageLength(msgType, piece_index);
 			byte[] payload = messageHandler.getPayload(msgType, piece_index);
 			connection.sendMessage(messageLength, payload);
-			System.out.println("Broadcaster: Sending " + msgType + " to peer " + connection.getRemotePeerId());
+			System.out.println("PayloadProcess: Sending " + msgType + " to peer " + connection.getRemotePeerId());
 
 		}
 	}
