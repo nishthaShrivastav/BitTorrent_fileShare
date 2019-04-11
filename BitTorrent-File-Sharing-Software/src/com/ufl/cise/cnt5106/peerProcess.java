@@ -22,14 +22,12 @@ public class peerProcess {
 
 		if(args.length!=1) {
 			throw new Exception("The number of arguments passed is  "+args.length+" but the required length is 1");
-
 		}
 
 		peerId = Integer.parseInt(args[0]);
 		Reader peerReader = null;
 		PeerInfoProperties peerInfo = new PeerInfoProperties();
 		Collection<RemotePeerInfo> peersToConnect= new LinkedList<>();
-
 		
 		try {
 			new LoadProperties();
@@ -44,8 +42,6 @@ public class peerProcess {
 			System.out.println("Peer "+peerId+" starting connections");
 			peer.TCPConnections();
 			peer.connectToPeers();
-
-
 		}
 		catch(Exception e){
 			e.printStackTrace();

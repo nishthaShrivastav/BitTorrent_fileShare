@@ -68,11 +68,12 @@ public class Peer {
 	
 }
 
-	private void createPeerConnection(RemotePeerInfo pi) {
+	public void createPeerConnection(RemotePeerInfo pi) {
 		
 		int peerPort = pi.getPeerPort();
 		String peerHost= pi.getHostName();
 		try {
+			System.out.println("about to create socket ");
 			Socket socket = new Socket(peerHost, peerPort);
 			System.out.println("created socket for"+pi.getHostName());
 			peerManager.createConnection(socket);
@@ -82,6 +83,7 @@ public class Peer {
 			System.out.println("Exception in createPeerConnection"+e);
 		}
 	}
+	
 
 	
 	
