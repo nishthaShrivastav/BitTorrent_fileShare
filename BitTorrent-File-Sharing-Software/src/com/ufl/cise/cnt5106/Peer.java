@@ -41,6 +41,7 @@ public class Peer {
 			//continue while all peers are yet to receive the file
 			while (false == allPeersReceivedFiles) {
 				Socket clientSocket = socket.accept();
+				System.out.println("Listening on socket");
 				peerManager.createConnection(clientSocket);
 			}
 		} catch (Exception e) {
@@ -76,7 +77,7 @@ public class Peer {
 			System.out.println("about to create socket ");
 			Socket socket = new Socket(peerHost, peerPort);
 			System.out.println("created socket for"+pi.getHostName());
-			peerManager.createConnection(socket);
+			peerManager.createConnection(socket,pi.getPeerId());
 			Thread.sleep(300);
 		}
 		catch(Exception e) {

@@ -17,10 +17,6 @@ public class Download implements Runnable {
 	public Download(Socket socket, SharedData data) {
 		init(socket, data);
 	}
-	
-	public Download(Socket socket, String id, SharedData data) {
-		init(socket, data);
-	}
 
 	private void init(Socket socket, SharedData data) {
 		this.socket = socket;
@@ -36,10 +32,10 @@ public class Download implements Runnable {
 
 	@Override
 	public void run() {
-		System.out.println("Downoad run started");
+		System.out.println("Download run started");
 
 		while (isAlive()) {
-		
+		System.out.println("is alive");
 			int messageLength = Integer.MIN_VALUE;
 			messageLength = receiveMessageLength();
 			if (!isAlive()) {
@@ -72,6 +68,7 @@ public class Download implements Runnable {
 	}
 	private void receiveRawData(byte[] messageLength) {
 		try {
+			System.out.println("reading from socket in "+Thread.currentThread().getName());
 			in.readFully(messageLength);
 		} catch (EOFException e) {
 			System.exit(0);

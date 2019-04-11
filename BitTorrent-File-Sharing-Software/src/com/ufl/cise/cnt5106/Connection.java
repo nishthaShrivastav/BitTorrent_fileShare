@@ -31,6 +31,7 @@ public class Connection {
 	}
 	
 	public Connection(Socket peerSocket) {
+		System.out.println("This connection");
 		this.peerSocket = peerSocket;
 		sharedData = new SharedData(this);
 		upload = new Upload(peerSocket, sharedData);
@@ -43,12 +44,16 @@ public class Connection {
 	public Connection(Socket peerSocket, String peerId) {
 		this.peerSocket = peerSocket;
 		sharedData = new SharedData(this);
-		upload = new Upload(peerSocket, peerId, sharedData);
-		download = new Download(peerSocket, peerId, sharedData);
+		upload = new Upload(peerSocket, sharedData);
+		download = new Download(peerSocket,sharedData);
+		System.out.println("about to create up down threads, connection th "+Thread.currentThread().getName());
 		createThreads(upload, download);
+		System.out.println("back to connection");
 		LoggerUtil.getInstance().logTcpConnectionTo(Peer.getInstance().getPeerInfo().getPeerId(), peerId);
+		System.out.println("Sending handshake");
 		sharedData.sendHandshake();
 		sharedData.setUpload(upload);
+		System.out.println("Starting ");
 		sharedData.run();
 	}
 	private void createThreads(Upload upload, Download download) {

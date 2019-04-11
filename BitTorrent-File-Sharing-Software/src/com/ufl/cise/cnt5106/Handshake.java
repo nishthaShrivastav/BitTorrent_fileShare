@@ -40,11 +40,5 @@ public class Handshake {
 		byte[] remote_PeerId = Arrays.copyOfRange(message, message.length - 4, message.length);
 		return new String(remote_PeerId);
 	}
-
-	public static synchronized boolean verification(byte[] message, String peerId) {
-		String receivedMsg = new String(message);
-		return receivedMsg.indexOf(peerId) != -1 &&  receivedMsg.contains(HANDSHAKE_HEADER);
-	}
-
 	
 }

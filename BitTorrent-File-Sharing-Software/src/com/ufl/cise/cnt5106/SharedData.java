@@ -55,6 +55,7 @@ public class SharedData implements Runnable{
 		while (isAlive) {
 			try {
 				byte[] p = payloadQueue.take();
+				System.out.println("sharedData: get payload from queue and send for processing");
 				processPayload(p);
 			} catch (InterruptedException e) {
 				System.out.println("Error in SharedData thread"+e);
@@ -90,6 +91,7 @@ public class SharedData implements Runnable{
 		MsgType msgType = getMessageType(p[0]);
 		MsgType responseMsgType = null;
 		int pieceIndex = Integer.MIN_VALUE;
+		System.out.println("message type"+msgType);
 		switch (msgType) {
 		case CHOKE:
 			LoggerUtil.getInstance().logChokingNeighbor(getTime(), peerProcess.getPeerId(), connection.getRemotePeerId());
