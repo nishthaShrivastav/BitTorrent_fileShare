@@ -15,8 +15,9 @@ public class Constants {
 	public static final String FILENAME = "FileName";
 	public static final String FILESIZE = "FileSize";
 	public static final String PIECESIZE = "PieceSize";
-	public static final String PEER_LOG_FILE_PATH = null;
-	public static final String PEER_LOG_FILE_EXTENSION = null;
+	public static final String LOG_FILE_PATH = System.getProperty("user.dir") + File.separatorChar
+			+ "/project/log_peer_";
+	public static final String LOG_FILE_EXTENSION = ".log";
 	
 	//System.getProperty("user.dir") fetches the directory or path of the workspace for the current project
 

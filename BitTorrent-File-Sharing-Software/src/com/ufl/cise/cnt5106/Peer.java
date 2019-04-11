@@ -14,11 +14,12 @@ public class Peer {
 	private RemotePeerInfo myPeerInfo;
 	private PeerManager peerManager; 
 	public static boolean allPeersReceivedFiles = false;
+	public int peerID;
 	
 	private Peer() {
 		myPeerInfo = PeerInfoProperties.getPeer(peerProcess.getPeerId());
 		peerManager = PeerManager.getPeerManager();
-		
+		peerID=peerProcess.getPeerId();
 	}
 	
 	public static Peer getInstance() {
@@ -32,7 +33,9 @@ public class Peer {
 	public void setPeerInfo(RemotePeerInfo peerInfo) {
 		this.myPeerInfo = peerInfo;
 	}
-	
+	public int getPeerID() {
+		return peerID;
+	}
 	public void connectToPeers() throws IOException {
 
 		ServerSocket socket = null;

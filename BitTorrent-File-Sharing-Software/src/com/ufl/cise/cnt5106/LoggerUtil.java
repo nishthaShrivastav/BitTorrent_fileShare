@@ -19,11 +19,10 @@ private static LoggerUtil customLogger;
 public static PrintWriter printWriter = null;
 private LoggerUtil() {
 	try {
-		System.out.println(Peer.getInstance().getPeerInfo().getPeerId());
+		System.out.println(Peer.getInstance().getPeerID());
 
-		File file = new File(Constants.PEER_LOG_FILE_PATH + Peer.getInstance().getPeerInfo().getPeerId()
-			+ Constants.PEER_LOG_FILE_EXTENSION);
-		file.getParentFile().mkdirs(); // Will create parent directories if not exists
+		File file = new File(Constants.LOG_FILE_PATH + Peer.getInstance().getPeerID() + Constants.LOG_FILE_EXTENSION);
+		file.getParentFile().mkdirs();
 		file.createNewFile();
 		FileOutputStream fileOutputStream = new FileOutputStream(file, false);
 		printWriter = new PrintWriter(fileOutputStream, true);
