@@ -45,6 +45,7 @@ public class PeerManager{
 			@Override
 			public void run() {
 				if (peersWithFullFile.size() == num_peers - 1 && splitFile.isCompleteFile()) {
+					System.out.println("All peers have the file, stop program");
 					System.exit(0);
 				}
 				if (prefNeighbors.size() > 1) {
