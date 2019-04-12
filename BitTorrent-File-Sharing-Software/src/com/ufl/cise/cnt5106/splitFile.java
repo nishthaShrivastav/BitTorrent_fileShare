@@ -12,6 +12,8 @@ import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,7 +34,7 @@ public class splitFile extends Thread{
 	public LinkedBlockingQueue<byte[]> fileQueue;
 	private static splitFile split;
 	private volatile static BitSet filePieces;
-	private volatile HashMap<Connection, Integer> requestedPieces;
+	private volatile HashMap<Integer, Connection> requestedPieces;
 	private static ConcurrentHashMap<Integer, byte[]> file;
 	private static FileChannel writeFileChannel;
 	
@@ -173,14 +175,16 @@ public class splitFile extends Thread{
 	
 	
 	
-	public synchronized void addRequestedPiece(Connection connection, int pieceIndex) {
-		requestedPieces.put(connection, pieceIndex);
+	public synchronized void addRequestedPiece(int pieceIndex, Connection connection ) {
+		requestedPieces.put(pieceIndex,connection);
 
 	}
 
-	public synchronized void removeRequestedPiece(Connection connection) {
-		requestedPieces.remove(connection);
+	public synchronized void removeRequestedPiece(int pieceindex, Connection connection) {
+		
+		requestedPieces.remove(pieceindex);
 	}
+	
 	
 	public static BitSet getFilePieces() {
 		return filePieces;
@@ -204,7 +208,23 @@ public class splitFile extends Thread{
 		myClone.and(peerClone);
 		System.out.println(peerClone + " " + myClone);
 		int[] missingPieces = myClone.stream().toArray();
-		return missingPieces[new Random().nextInt(missingPieces.length)];
+		int askpieceindex=new Random().nextInt(missingPieces.length);
+		while(requestedPieces.containsKey(askpieceindex)) {
+			askpieceindex=new Random().nextInt(missingPieces.length);
+		}
+			return missingPieces[askpieceindex];
+		
+	}
+
+	public synchronized void removeRequestedPieces(Connection connection) {
+		// TODO Auto-generated method stub
+		Iterator it = requestedPieces.entrySet().iterator();
+		 while (it.hasNext()) {
+		        Map.Entry pair = (Map.Entry)it.next();
+		        if(pair.getValue()==connection)
+		        	requestedPieces.remove(pair.getKey());
+		        it.remove(); // avoids a ConcurrentModificationException
+		    }
 		
 	}
 	

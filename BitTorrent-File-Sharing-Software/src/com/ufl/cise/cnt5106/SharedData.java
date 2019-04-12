@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import com.ufl.cise.conf.Common;
@@ -29,6 +30,7 @@ public class SharedData implements Runnable{
 	private MessageHandler messagehandler;
 	private boolean peerHasFile;
 	private PayloadProcess payloadProcess;
+	private PeerManager peermgr;
 	
 	
 	public SharedData(Connection connection) {
@@ -96,7 +98,7 @@ public class SharedData implements Runnable{
 		switch (msgType) {
 		case CHOKE:
 			LoggerUtil.getInstance().logChokingNeighbor(getTime(), peerProcess.getPeerId(), connection.getRemotePeerId());
-			connection.removeRequestedPiece();
+			connection.removeRequestedPieces(connection);
 			responseMsgType = null;
 			break;
 		case UNCHOKE:
@@ -104,6 +106,8 @@ public class SharedData implements Runnable{
 			LoggerUtil.getInstance().logUnchokingNeighbor(getTime(), peerProcess.getPeerId(), connection.getRemotePeerId());
 			responseMsgType = MsgType.REQUEST;
 			pieceIndex = splitFile.getRequestPieceIndex(connection);
+			if(pieceIndex!=Integer.MIN_VALUE)
+				connection.addRequestedPiece(pieceIndex);
 			break;
 		case INTERESTED:
 			// add to interested connections
@@ -146,14 +150,20 @@ public class SharedData implements Runnable{
 			break;
 		case REQUEST:
 			// send requested piece
-			responseMsgType = MsgType.PIECE;
-			byte[] content = new byte[4];
-			System.arraycopy(p, 1, content, 0, 4);
-			pieceIndex = ByteBuffer.wrap(content).getInt();
-			if (pieceIndex == Integer.MIN_VALUE) {
-				System.out.println("received file");
-				responseMsgType = null;
+			if(peermgr.getpreferredneighbours().contains(connection)) {
+				responseMsgType = MsgType.PIECE;
+				byte[] content = new byte[4];
+				System.arraycopy(p, 1, content, 0, 4);
+				pieceIndex = ByteBuffer.wrap(content).getInt();
+				if (pieceIndex == Integer.MIN_VALUE) {
+					System.out.println("received file");
+					responseMsgType = null;
+				}
 			}
+			else {
+				responseMsgType=null;
+			}
+			
 			break;
 		case PIECE:
 			/*
@@ -163,12 +173,17 @@ public class SharedData implements Runnable{
 			 */
 			pieceIndex = ByteBuffer.wrap(p, 1, 4).getInt();
 			connection.addToBytesDownloaded(p.length);
+			
+			
+			connection.removeRequestedPiece(pieceIndex);
 			splitFile.setPiece(Arrays.copyOfRange(p, 1, p.length));
 			LoggerUtil.getInstance().logDownloadedPiece(getTime(), peerProcess.getPeerId(), connection.getRemotePeerId(),
 				pieceIndex, splitFile.getReceivedFileSize());
 			responseMsgType = MsgType.REQUEST;
 			connection.tellAllNeighbors(pieceIndex);
 			pieceIndex = splitFile.getRequestPieceIndex(connection);
+			if(pieceIndex!=Integer.MIN_VALUE)
+				connection.addRequestedPiece(pieceIndex);
 			if (pieceIndex == Integer.MIN_VALUE) {
 				LoggerUtil.getInstance().logFinishedDownloading(getTime(), peerProcess.getPeerId());
 				splitFile.writeToFile(peerProcess.getPeerId());

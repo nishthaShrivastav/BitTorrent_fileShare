@@ -126,6 +126,9 @@ public class PeerManager{
 		uninterested.remove(connection);
 	}
 
-	
+	public synchronized PriorityQueue<Connection> getpreferredneighbours(){
+		return prefNeighbors;
+		
+	}
 	
 }

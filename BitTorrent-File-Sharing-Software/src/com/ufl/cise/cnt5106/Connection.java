@@ -92,15 +92,19 @@ public class Connection {
 
 	
 	protected synchronized void addRequestedPiece(int pieceIndex) {
-		splitFile.getInstance().addRequestedPiece(this, pieceIndex);
+		splitFile.getInstance().addRequestedPiece( pieceIndex,this);
 	}
 
 	public BitSet getPeerBitSet() {
 		return sharedData.getPeerBitSet();
 	}
 
-	public void removeRequestedPiece() {
-		splitFile.getInstance().removeRequestedPiece(this);
+	public void removeRequestedPiece(int pieceIndex) {
+		splitFile.getInstance().removeRequestedPiece(pieceIndex,this);
+	}
+	
+	public void removeRequestedPieces(Connection connection) {
+		splitFile.getInstance().removeRequestedPieces(this);
 	}
 
 	public void addInterestedConnection() {
