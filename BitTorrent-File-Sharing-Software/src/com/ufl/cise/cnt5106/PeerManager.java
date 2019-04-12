@@ -145,6 +145,7 @@ public class PeerManager implements Runnable{
 		if (prefNeighbors.size() <= numPrefNeighbors && !prefNeighbors.contains(connection)) {
 			connection.setDownloadedbytes(0);
 			prefNeighbors.add(connection);
+			System.out.println("Added to pref neighbors");
 			payloadProcess.addMessage(new Object[] { connection, Message.MsgType.UNCHOKE, Integer.MIN_VALUE });
 		}
 		interested.add(connection);

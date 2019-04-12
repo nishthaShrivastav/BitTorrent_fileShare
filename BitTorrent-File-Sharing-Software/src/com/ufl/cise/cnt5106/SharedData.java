@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Calendar;
 import java.util.Iterator;
+import java.util.PriorityQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import com.ufl.cise.conf.Common;
@@ -97,7 +98,7 @@ public class SharedData implements Runnable{
 		System.out.println("Shareddata processPayload message received:"+msgType);
 		switch (msgType) {
 		case CHOKE:
-			LoggerUtil.getInstance().logChokingNeighbor(getTime(), peerProcess.getPeerId(), connection.getRemotePeerId());
+			LoggerUtil.getInstance().logChokingNeighbor(getTime(),connection.getRemotePeerId(), peerProcess.getPeerId());
 			connection.removeRequestedPieces(connection);
 			responseMsgType = null;
 			break;
@@ -135,7 +136,7 @@ public class SharedData implements Runnable{
 			else {
 				responseMsgType=MsgType.NOTINTERESTED;
 			}
-			
+
 			break;
 		case BITFIELD:
 			// update peer bitset
@@ -150,7 +151,8 @@ public class SharedData implements Runnable{
 			break;
 		case REQUEST:
 			// send requested piece
-			if(peermgr.getpreferredneighbours().contains(connection)) {
+			PriorityQueue<Connection> queue=peermgr.getpreferredneighbours();
+			if(queue.isEmpty()|| (!queue.isEmpty() && queue.contains(connection))) {
 				responseMsgType = MsgType.PIECE;
 				byte[] content = new byte[4];
 				System.arraycopy(p, 1, content, 0, 4);
@@ -163,7 +165,7 @@ public class SharedData implements Runnable{
 			else {
 				responseMsgType=null;
 			}
-			
+
 			break;
 		case PIECE:
 			/*
@@ -173,12 +175,12 @@ public class SharedData implements Runnable{
 			 */
 			pieceIndex = ByteBuffer.wrap(p, 1, 4).getInt();
 			connection.addToBytesDownloaded(p.length);
-			
-			
+
+
 			connection.removeRequestedPiece(pieceIndex);
 			splitFile.setPiece(Arrays.copyOfRange(p, 1, p.length));
 			LoggerUtil.getInstance().logDownloadedPiece(getTime(), peerProcess.getPeerId(), connection.getRemotePeerId(),
-				pieceIndex, splitFile.getReceivedFileSize());
+					pieceIndex, splitFile.getReceivedFileSize());
 			responseMsgType = MsgType.REQUEST;
 			connection.tellAllNeighbors(pieceIndex);
 			pieceIndex = splitFile.getRequestPieceIndex(connection);
@@ -208,10 +210,10 @@ public class SharedData implements Runnable{
 			break;
 		}
 		if (null != responseMsgType) {
-			
+
 			payloadProcess.addMessage(new Object[] { connection, responseMsgType, pieceIndex });
 		}
-		
+
 	}
 
 	private MsgType getMessageType(byte b) {
