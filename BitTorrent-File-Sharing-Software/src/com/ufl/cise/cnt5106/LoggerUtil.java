@@ -66,12 +66,12 @@ public void logChangePreferredNeighbors(String timestamp, int i, PriorityQueue<C
 	}
 	writeToFile(log.toString() + ".");
 }
-public void logOptimisticallyUnchokeNeighbor(String timestamp, String source, String unchokedNeighbor) {
+public void logOptimisticallyUnchokeNeighbor(String timestamp, int i, String unchokedNeighbor) {
 	writeToFile(
-			timestamp + "Peer " + source + " has the optimistically unchoked neighbor " + unchokedNeighbor + ".");
+			timestamp + "Peer " + i + " has the optimistically unchoked neighbor " + unchokedNeighbor + ".");
 }
-public void logUnchokingNeighbor(String timestamp, int i, String peerId2) {
-	writeToFile(timestamp + "Peer " + i + " is unchoked by " + peerId2 + ".");
+public void logUnchokingNeighbor(String timestamp, String unchokedPeer, int peer) {
+	writeToFile(timestamp + "Peer " + unchokedPeer + " is unchoked by " + peer + ".");
 }
 public void logChokingNeighbor(String timestamp, int i, String peerId2) {
 	writeToFile(timestamp + "Peer " + i + " is choked by " + peerId2 + ".");

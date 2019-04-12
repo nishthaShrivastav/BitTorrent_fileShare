@@ -103,7 +103,7 @@ public class SharedData implements Runnable{
 			break;
 		case UNCHOKE:
 			// respond with request
-			LoggerUtil.getInstance().logUnchokingNeighbor(getTime(), peerProcess.getPeerId(), connection.getRemotePeerId());
+			LoggerUtil.getInstance().logUnchokingNeighbor(getTime(), connection.getRemotePeerId(), peerProcess.getPeerId());
 			responseMsgType = MsgType.REQUEST;
 			pieceIndex = splitFile.getRequestPieceIndex(connection);
 			if(pieceIndex!=Integer.MIN_VALUE)

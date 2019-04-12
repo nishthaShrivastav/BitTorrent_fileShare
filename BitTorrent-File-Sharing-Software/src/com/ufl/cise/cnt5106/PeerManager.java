@@ -11,73 +11,97 @@ import java.util.*;
 import com.ufl.cise.conf.*;
 import com.ufl.cise.messages.*;
 
-
-public class PeerManager{
+import org.apache.commons.collections4.*;
+public class PeerManager implements Runnable{
 	
+	class OptimisticUnchoker extends Thread {
+		
+		 @Override
+	        public void run() {
+             try {
+                 Thread.sleep(optUnchokingInterval);
+             } catch (InterruptedException ex) {
+             }
+
+				Collections.shuffle(allConnections);
+				for (Connection conn : allConnections) {
+					if (interested.contains(conn) && !prefNeighbors.contains(conn) && !conn.hasFile()) {
+						payloadProcess.addMessage(new Object[] { conn, Message.MsgType.UNCHOKE, Integer.MIN_VALUE });
+						prefNeighbors.add(conn);
+						LoggerUtil.getInstance().logOptimisticallyUnchokeNeighbor(getTime(), peerProcess.getPeerId(),conn.getRemotePeerId());
+					}
+				}
+			
+             
+		 }
+	}
+	private int optUnchokingInterval = Common.getOptimisticUnchokingInterval();
 	private static PeerManager peerManager;
-	private HashSet<Connection> connections;
 	private HashSet<Connection> uninterested;
+	private HashSet<Connection> interested;
 	private PriorityQueue<Connection> prefNeighbors;
 	public HashSet<String> peersWithFullFile = new HashSet<String>();
-	private int num_pref = Common.getNumberOfPreferredNeighbors();
-	private int opt_unchoking = Common.getOptimisticUnchokingInterval();
-	private int unchoking = Common.getUnchokingInterval();
-	private HashSet<Connection> allConnections;
-	private int num_peers= PeerInfoProperties.numberOfPeers();
+	private int numPrefNeighbors = Common.getNumberOfPreferredNeighbors();
+	private OptimisticUnchoker optUnchoker;
+	private int unchokingInterval = Common.getUnchokingInterval();
+	private List<Connection> allConnections;
 	private splitFile splitFile;
 	private PayloadProcess payloadProcess;
-	
+	PeerInfoProperties peerInfo = new PeerInfoProperties();
+
 	private PeerManager() {
 
 		uninterested = new HashSet<>();
-		prefNeighbors = new PriorityQueue<>(num_pref + 1,
+		prefNeighbors = new PriorityQueue<>(numPrefNeighbors + 1,
 				(a, b) -> (int) a.getBytesDownloaded() - (int) b.getBytesDownloaded());
 		payloadProcess = PayloadProcess.getInstance();
 		splitFile =splitFile.getInstance();
-		allConnections = new HashSet<>();
-		//monitor();
-	
+		allConnections = new ArrayList<Connection>();
+		interested = new HashSet<>();
 	}
 	
-	private void monitor() {
-		new Timer().scheduleAtFixedRate(new TimerTask() {
-
-			@Override
-			public void run() {
-				if (peersWithFullFile.size() == num_peers - 1 && splitFile.isCompleteFile()) {
-					System.out.println("All peers have the file, stop program");
-					System.exit(0);
-				}
-				if (prefNeighbors.size() > 1) {
-					Connection conn = prefNeighbors.poll();
-					conn.setDownloadedbytes(0);
-					for (Connection connT : prefNeighbors) {
-						connT.setDownloadedbytes(0);
-					}
-					payloadProcess.addMessage(new Object[] { conn, Message.MsgType.CHOKE, Integer.MIN_VALUE });
-					LoggerUtil.getInstance().logChangePreferredNeighbors(getTime(), peerProcess.getPeerId(),prefNeighbors);
-					 System.out.println("Choking:" + conn.getRemotePeerId());
-				}
-			}
+	@Override
+	public void run() {
+		optUnchoker.start();
+		try {
+			Thread.sleep(unchokingInterval);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		List<Connection> interestedPeers = new ArrayList<Connection>(interested);
+		RemotePeerInfo peer = peerInfo.getPeer(peerProcess.getPeerId());
+		if(peer!=null && peer.hasFile) {
+			Collections.shuffle(interestedPeers);
 			
-		}, new Date(), unchoking * 1000);
-		
-		
-		new Timer().scheduleAtFixedRate(new TimerTask() {
-			@Override
-			public void run() {
-				for (Connection conn : allConnections) {
-					if (!uninterested.contains(conn) && !prefNeighbors.contains(conn) && !conn.hasFile()) {
-						payloadProcess.addMessage(new Object[] { conn, Message.MsgType.UNCHOKE, Integer.MIN_VALUE });
-						prefNeighbors.add(conn);
-						//LoggerUtil.getInstance().logOptimisticallyUnchokeNeighbor(getTime(), peerProcessMain.getId(),	conn.getRemotePeerId());
-					}
-				}
-			}
-		}, new Date(), opt_unchoking * 1000);
-		
-	}
+		}
+		else {
+		Collections.sort(interestedPeers,
+				(a, b) -> (int) b.getBytesDownloaded() - (int) a.getBytesDownloaded());
+		//tempPref is used to decide which neighbors to choke after this 
+	
+		}
+		PriorityQueue<Connection> tempPref = new PriorityQueue<>(numPrefNeighbors + 1,
+				(a, b) -> (int) a.getBytesDownloaded() - (int) b.getBytesDownloaded());
+		//update preferred neighbors
+		prefNeighbors.clear();
+		prefNeighbors.addAll(interestedPeers.subList(0, Math.min(numPrefNeighbors, interestedPeers.size())));
+		Collection<Connection> chokeNeighbors=CollectionUtils.subtract(tempPref, prefNeighbors);
+		Collection<Connection> unchokeNeighbors=CollectionUtils.subtract(prefNeighbors,tempPref);
 
+		for(Connection conn : chokeNeighbors) {
+			payloadProcess.addMessage(new Object[] { conn, Message.MsgType.CHOKE, Integer.MIN_VALUE });
+			LoggerUtil.getInstance().logChangePreferredNeighbors(getTime(), peerProcess.getPeerId(),prefNeighbors);
+			System.out.println("Choking:" + conn.getRemotePeerId());
+
+		}
+		for(Connection conn: unchokeNeighbors) {
+			payloadProcess.addMessage(new Object[] { conn, Message.MsgType.UNCHOKE, Integer.MIN_VALUE });
+			LoggerUtil.getInstance().logUnchokingNeighbor(getTime(), conn.getRemotePeerId(), peerProcess.getPeerId());
+		}
+
+	}
 	public static PeerManager getPeerManager() {
 
 		if (peerManager == null) {
@@ -118,11 +142,12 @@ public class PeerManager{
 	}
 
 	public synchronized void addInterestedConnection(String peerId, Connection connection) {
-		if (prefNeighbors.size() <= num_pref && !prefNeighbors.contains(connection)) {
+		if (prefNeighbors.size() <= numPrefNeighbors && !prefNeighbors.contains(connection)) {
 			connection.setDownloadedbytes(0);
 			prefNeighbors.add(connection);
 			payloadProcess.addMessage(new Object[] { connection, Message.MsgType.UNCHOKE, Integer.MIN_VALUE });
 		}
+		interested.add(connection);
 		uninterested.remove(connection);
 	}
 
@@ -130,5 +155,5 @@ public class PeerManager{
 		return prefNeighbors;
 		
 	}
-	
+
 }

@@ -73,7 +73,6 @@ public class Peer {
 }
 
 	public void createPeerConnection(RemotePeerInfo pi) {
-		
 		int peerPort = pi.getPeerPort();
 		String peerHost= pi.getHostName();
 		try {
