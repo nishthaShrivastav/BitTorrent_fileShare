@@ -14,18 +14,22 @@ public class PeerManager implements Runnable{
 	
 	class OptimisticUnchoker extends Thread {
 		
+		private int optUnchokingInterval = Common.getOptimisticUnchokingInterval();
+		PriorityQueue<Connection> preferredNeighbors;
+		public OptimisticUnchoker() {
+			preferredNeighbors=getpreferredneighbours();
+		}
 		 @Override
 	        public void run() {
              try {
                  Thread.sleep(optUnchokingInterval);
              } catch (InterruptedException ex) {
              }
-
 				Collections.shuffle(allConnections);
 				for (Connection conn : allConnections) {
-					if (interested.contains(conn) && !prefNeighbors.contains(conn) && !conn.hasFile()) {
+					if (interested.contains(conn) && !preferredNeighbors.contains(conn) && !conn.hasFile()) {
 						payloadProcess.addMessage(new Object[] { conn, Message.MsgType.UNCHOKE, Integer.MIN_VALUE });
-						prefNeighbors.add(conn);
+						preferredNeighbors.add(conn);
 						System.out.println("Optimistic unchoke peer "+conn.remotePeerId);
 						LoggerUtil.getInstance().logOptimisticallyUnchokeNeighbor(getTime(), peerProcess.getPeerId(),conn.getRemotePeerId());
 					}
@@ -34,7 +38,7 @@ public class PeerManager implements Runnable{
              
 		 }
 	}
-	private int optUnchokingInterval = Common.getOptimisticUnchokingInterval();
+	
 	private static PeerManager peerManager;
 	private HashSet<Connection> uninterested;
 	private HashSet<Connection> interested;
@@ -58,6 +62,7 @@ public class PeerManager implements Runnable{
 		splitFile =splitFile.getInstance();
 		allConnections = new ArrayList<Connection>();
 		interested = new HashSet<>();
+		optUnchoker=new OptimisticUnchoker();
 		
 	}
 	
