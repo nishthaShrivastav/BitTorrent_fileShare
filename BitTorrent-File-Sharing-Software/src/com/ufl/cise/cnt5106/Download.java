@@ -16,6 +16,10 @@ public class Download implements Runnable {
 	public Download(Socket socket, SharedData data) {
 		init(socket, data);
 	}
+	public Download(Socket socket, String peerid,SharedData data) {
+		init(socket, data);
+	}
+	
 
 	private void init(Socket socket, SharedData data) {
 		this.socket = socket;
@@ -42,6 +46,7 @@ public class Download implements Runnable {
 			}
 			byte[] payload = new byte[messageLength];
 			receiveMessagePayload(payload);
+			System.out.println("Received message and adding payload to shareddata" +socket.getPort());
 			sharedData.addPayload(payload);
 
 		}

@@ -14,7 +14,7 @@ import com.ufl.cise.messages.Message.MsgType;
 import com.ufl.cise.messages.MessageHandler;
 
 
-public class SharedData implements Runnable{
+public class SharedData extends Thread{
 	
 	private LinkedBlockingQueue<byte[]> payloadQueue;
 	private boolean isAlive;

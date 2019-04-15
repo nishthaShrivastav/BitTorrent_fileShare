@@ -21,6 +21,9 @@ public class Upload implements Runnable {
 	public Upload(Socket socket, SharedData data) {
 		init(socket, data);
 	}
+	public Upload(Socket socket,String id, SharedData data) {
+		init(socket, data);
+	}
 
 	private void init(Socket client, SharedData data) {
 		uploadPayloadQueue = new LinkedBlockingQueue<>();
@@ -48,7 +51,7 @@ public class Upload implements Runnable {
 				byte[] payload = uploadPayloadQueue.take();
 				out.write(payload);
 				out.flush();
-				System.out.println("Written to socket out stream");
+				System.out.println("Written to socket out stream of "+socket.getPort());
 			} catch (SocketException e) {
 				isAlive = false;
 			} catch (Exception e) {
