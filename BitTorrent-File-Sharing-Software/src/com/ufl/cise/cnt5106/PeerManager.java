@@ -26,6 +26,7 @@ public class PeerManager implements Runnable{
 					if (interested.contains(conn) && !prefNeighbors.contains(conn) && !conn.hasFile()) {
 						payloadProcess.addMessage(new Object[] { conn, Message.MsgType.UNCHOKE, Integer.MIN_VALUE });
 						prefNeighbors.add(conn);
+						System.out.println("Optimistic unchoke peer "+conn.remotePeerId);
 						LoggerUtil.getInstance().logOptimisticallyUnchokeNeighbor(getTime(), peerProcess.getPeerId(),conn.getRemotePeerId());
 					}
 				}
@@ -53,9 +54,11 @@ public class PeerManager implements Runnable{
 		prefNeighbors = new PriorityQueue<>(numPrefNeighbors + 1,
 				(a, b) -> (int) a.getBytesDownloaded() - (int) b.getBytesDownloaded());
 		payloadProcess = PayloadProcess.getInstance();
+		System.out.println("clock started at "+System.currentTimeMillis());
 		splitFile =splitFile.getInstance();
 		allConnections = new ArrayList<Connection>();
 		interested = new HashSet<>();
+		
 	}
 	
 	@Override
@@ -80,8 +83,8 @@ public class PeerManager implements Runnable{
 		//tempPref is used to decide which neighbors to choke after this 
 	
 		}
-		PriorityQueue<Connection> tempPref = new PriorityQueue<>(numPrefNeighbors + 1,
-				(a, b) -> (int) a.getBytesDownloaded() - (int) b.getBytesDownloaded());
+		PriorityQueue<Connection> tempPref = new PriorityQueue<Connection>();
+		tempPref.addAll(prefNeighbors);
 		//update preferred neighbors
 		prefNeighbors.clear();
 		prefNeighbors.addAll(interestedPeers.subList(0, Math.min(numPrefNeighbors, interestedPeers.size())));
@@ -96,6 +99,7 @@ public class PeerManager implements Runnable{
 		}
 		for(Connection conn: unchokeNeighbors) {
 			payloadProcess.addMessage(new Object[] { conn, Message.MsgType.UNCHOKE, Integer.MIN_VALUE });
+			System.out.println("Unchoke new pref neighbors"+conn.remotePeerId);
 			LoggerUtil.getInstance().logUnchokingNeighbor(getTime(), conn.getRemotePeerId(), peerProcess.getPeerId());
 		}
 
@@ -104,6 +108,7 @@ public class PeerManager implements Runnable{
 
 		if (peerManager == null) {
 			peerManager = new PeerManager();
+			peerManager.run();
 		}
 		return peerManager;
 	

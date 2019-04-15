@@ -184,6 +184,7 @@ public class splitFile extends Thread{
 	public synchronized int getRequestPieceIndex(Connection conn) {
 		if (isCompleteFile()) {
 			System.out.println("File received");
+			System.out.println("clock ended at "+System.currentTimeMillis());
 			return Integer.MIN_VALUE;
 		}
 		BitSet peerBitset = conn.getPeerBitSet();
