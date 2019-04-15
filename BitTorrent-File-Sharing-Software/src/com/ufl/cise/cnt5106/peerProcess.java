@@ -1,9 +1,8 @@
 package com.ufl.cise.cnt5106;
+
 import java.io.*;
 import java.util.*;
-
 import com.ufl.cise.conf.*;
-
 /*
  * main function to start program
  * 

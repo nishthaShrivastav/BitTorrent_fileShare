@@ -4,7 +4,6 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.PriorityQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -41,6 +40,7 @@ public class SharedData implements Runnable{
 		splitFile = splitFile.getInstance();
 		payloadProcess= PayloadProcess.getInstance();
 		peerBitset = new BitSet(Common.getNumberOfPieces());
+		peermgr = PeerManager.getPeerManager();
 	}
 	
 	public void setUpload(Upload val) {
@@ -152,7 +152,7 @@ public class SharedData implements Runnable{
 		case REQUEST:
 			// send requested piece
 			PriorityQueue<Connection> queue=peermgr.getpreferredneighbours();
-			if(queue.isEmpty()|| (!queue.isEmpty() && queue.contains(connection))) {
+			if(queue==null || queue.isEmpty()|| (!queue.isEmpty() && queue.contains(connection))) {
 				responseMsgType = MsgType.PIECE;
 				byte[] content = new byte[4];
 				System.arraycopy(p, 1, content, 0, 4);
@@ -197,11 +197,14 @@ public class SharedData implements Runnable{
 			break;
 		case HANDSHAKE:
 			remotePeerId = Handshake.get_Id(p);
+			System.out.println("Received handhake and setting remotepeerid as "+remotePeerId);
 			connection.setPeerId(remotePeerId);
 			connection.addAllConnections();
 			if (!getUploadHandshake()) {
 				setUploadHandshake();
+				System.out.println("Setting uploadHandshake with peer "+remotePeerId);
 				LoggerUtil.getInstance().logTcpConnectionFrom(host.getPeerInfo().getPeerId(), remotePeerId);
+				System.out.println("Sending handshake response to "+remotePeerId);
 				payloadProcess.addMessage(new Object[] { connection, MsgType.HANDSHAKE, Integer.MIN_VALUE });
 			}
 			if (splitFile.hasAnyPieces()) {
@@ -209,6 +212,7 @@ public class SharedData implements Runnable{
 			}
 			break;
 		}
+		System.out.println("Sending response messagetype :"+responseMsgType+"to "+remotePeerId);
 		if (null != responseMsgType) {
 
 			payloadProcess.addMessage(new Object[] { connection, responseMsgType, pieceIndex });

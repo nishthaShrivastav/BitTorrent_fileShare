@@ -4,14 +4,12 @@ package com.ufl.cise.cnt5106;
  * TO DO: add choking interval functions  
  * 
  */
-
 import java.net.Socket;
-
 import java.util.*;
 import com.ufl.cise.conf.*;
 import com.ufl.cise.messages.*;
-
 import org.apache.commons.collections4.*;
+
 public class PeerManager implements Runnable{
 	
 	class OptimisticUnchoker extends Thread {

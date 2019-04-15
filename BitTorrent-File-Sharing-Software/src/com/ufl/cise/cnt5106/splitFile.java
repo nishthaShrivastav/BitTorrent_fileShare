@@ -155,24 +155,15 @@ public class splitFile extends Thread{
 		}
 	}
 	public synchronized void writeToFile(int peerId) {
-		String filename = peerId + File.separatorChar+ Common.getFileName(); //path names check from constants
-		System.out.println(filename);
-		FileOutputStream fos = null;
-		try {
-			fos = new FileOutputStream(filename);
 			for (int i = 0; i < file.size(); i++) {
 				try {
-					fos.write(file.get(i));
+					ByteBuffer Bb = ByteBuffer.wrap(file.get(i));
+					writeFileChannel.write(Bb);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	
+		} 
 	
 	public synchronized void addRequestedPiece(int pieceIndex, Connection connection ) {
 		requestedPieces.put(pieceIndex,connection);
@@ -216,7 +207,6 @@ public class splitFile extends Thread{
 	}
 
 	public synchronized void removeRequestedPieces(Connection connection) {
-		// TODO Auto-generated method stub
 		Iterator it = requestedPieces.entrySet().iterator();
 		 while (it.hasNext()) {
 		        Map.Entry pair = (Map.Entry)it.next();

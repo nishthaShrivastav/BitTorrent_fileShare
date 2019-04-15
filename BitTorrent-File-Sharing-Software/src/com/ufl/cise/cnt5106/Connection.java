@@ -50,10 +50,9 @@ public class Connection {
 		createThreads(upload, download);
 		System.out.println("back to connection");
 		LoggerUtil.getInstance().logTcpConnectionTo(Peer.getInstance().getPeerInfo().getPeerId(), peerId);
-		System.out.println("Sending handshake");
+		System.out.println("Sending handshake to "+peerId);
 		sharedData.sendHandshake();
 		sharedData.setUpload(upload);
-		System.out.println("Starting ");
 		sharedData.run();
 	}
 	private void createThreads(Upload upload, Download download) {

@@ -7,13 +7,12 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 
 public class Download implements Runnable {
-	
+
 	Socket socket;
 	private SharedData sharedData;
 	private boolean isAlive;
 	private DataInputStream in;
-	
-	
+
 	public Download(Socket socket, SharedData data) {
 		init(socket, data);
 	}
@@ -27,7 +26,7 @@ public class Download implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	@Override
@@ -35,7 +34,7 @@ public class Download implements Runnable {
 		System.out.println("Download run started");
 
 		while (isAlive()) {
-		System.out.println("is alive");
+			System.out.println("is alive");
 			int messageLength = Integer.MIN_VALUE;
 			messageLength = receiveMessageLength();
 			if (!isAlive()) {
@@ -44,14 +43,14 @@ public class Download implements Runnable {
 			byte[] payload = new byte[messageLength];
 			receiveMessagePayload(payload);
 			sharedData.addPayload(payload);
-			
+
 		}
-	
+
 	}
 
 	private void receiveMessagePayload(byte[] payload) {
 		receiveRawData(payload);
-		
+
 	}
 
 	private int receiveMessageLength() {
@@ -64,7 +63,7 @@ public class Download implements Runnable {
 			e.printStackTrace();
 		}
 		return len;
-		
+
 	}
 	private void receiveRawData(byte[] messageLength) {
 		try {
