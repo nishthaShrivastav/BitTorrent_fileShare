@@ -5,10 +5,21 @@ package com.ufl.cise.cnt5106;
  * 
  */
 import java.net.Socket;
-import java.util.*;
-import com.ufl.cise.conf.*;
-import com.ufl.cise.messages.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.PriorityQueue;
+
+
 import org.apache.commons.collections4.*;
+
+import com.ufl.cise.conf.Common;
+import com.ufl.cise.conf.PeerInfoProperties;
+import com.ufl.cise.conf.RemotePeerInfo;
+import com.ufl.cise.messages.Message;
 
 public class PeerManager implements Runnable{
 	
