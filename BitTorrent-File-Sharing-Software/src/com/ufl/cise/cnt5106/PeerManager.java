@@ -108,13 +108,17 @@ public class PeerManager implements Runnable{
 			toUnchoke.addAll(prefNeighbors);
 
 			toChoke.removeAll(prefNeighbors);
+			toUnchoke.removeAll(oldPref);
+			for(Connection conn:allConnections) {
+				conn.setDownloadedbytes(0);
+			}
 			for(Connection conn : toChoke) {
 				payloadProcess.addMessage(new Object[] { conn, Message.MsgType.CHOKE, Integer.MIN_VALUE });
 				LoggerUtil.getInstance().logChangePreferredNeighbors(getTime(), peerProcess.getPeerId(),prefNeighbors);
 				System.out.println("Choking:" + conn.getRemotePeerId());
 
 			}
-			toUnchoke.removeAll(oldPref);
+			
 			for(Connection conn: toUnchoke) {
 				payloadProcess.addMessage(new Object[] { conn, Message.MsgType.UNCHOKE, Integer.MIN_VALUE });
 				System.out.println("Unchoke new pref neighbors"+conn.remotePeerId);
@@ -165,7 +169,7 @@ public class PeerManager implements Runnable{
 	}
 
 	public synchronized void addInterestedConnection(String peerId, Connection connection) {
-		if (prefNeighbors.size() <= numPrefNeighbors && !prefNeighbors.contains(connection)) {
+		if (prefNeighbors.size() < numPrefNeighbors && !prefNeighbors.contains(connection)) {
 			connection.setDownloadedbytes(0);
 			prefNeighbors.add(connection);
 			System.out.println("Added to pref neighbors" +connection.remotePeerId);
