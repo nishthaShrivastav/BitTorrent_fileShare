@@ -208,13 +208,12 @@ public class splitFile extends Thread{
 	}
 
 	public synchronized void removeRequestedPieces(Connection connection) {
-		Iterator it = requestedPieces.entrySet().iterator();
-		 while (it.hasNext()) {
-		        Map.Entry pair = (Map.Entry)it.next();
-		        if(pair.getValue()==connection)
-		        	requestedPieces.remove(pair.getKey());
-		        it.remove(); // avoids a ConcurrentModificationException
-		    }
+		for (Iterator<Connection> iterator = requestedPieces.values().iterator(); iterator.hasNext(); ) {
+			Connection conn = iterator.next();
+			if(connection.remotePeerId==conn.remotePeerId) {
+				iterator.remove();
+			}
+		}
 		
 	}
 	

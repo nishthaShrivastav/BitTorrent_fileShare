@@ -163,7 +163,7 @@ public class PeerManager{
 					for(Connection conn: toUnchoke) {
 						payloadProcess.addMessage(new Object[] { conn, Message.MsgType.UNCHOKE, Integer.MIN_VALUE });
 						System.out.println("Unchoke new pref neighbors"+conn.remotePeerId);
-						LoggerUtil.getInstance().logUnchokingNeighbor(getTime(), conn.getRemotePeerId(), peerProcess.getPeerId());
+						LoggerUtil.getInstance().logUnchokingNeighbor(getTime(), Integer.parseInt(conn.getRemotePeerId()),String.valueOf(peerProcess.getPeerId()));
 					}
 
 				}

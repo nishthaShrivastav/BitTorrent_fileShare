@@ -70,11 +70,11 @@ public void logOptimisticallyUnchokeNeighbor(String timestamp, int i, String unc
 	writeToFile(
 			timestamp + "Peer " + i + " has the optimistically unchoked neighbor " + unchokedNeighbor + ".");
 }
-public void logUnchokingNeighbor(String timestamp, String unchokedPeer, int peer) {
+public void logUnchokingNeighbor(String timestamp, int unchokedPeer, String peer) {
 	writeToFile(timestamp + "Peer " + unchokedPeer + " is unchoked by " + peer + ".");
 }
-public void logChokingNeighbor(String timestamp, String unchokedPeer, int peer) {
-	writeToFile(timestamp + "Peer " + unchokedPeer + " is choked by " + peer + ".");
+public void logChokingNeighbor(String timestamp, int chokedPeer, String peer) {
+	writeToFile(timestamp + "Peer " + chokedPeer + " is choked by " + peer + ".");
 }
 public void logReceivedHaveMessage(String timestamp, int i, String from, int pieceIndex) {
 	writeToFile(timestamp + "Peer " + i + " received the 'have' message from " + from + " for the piece "

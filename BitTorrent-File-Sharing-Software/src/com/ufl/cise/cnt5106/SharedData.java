@@ -99,13 +99,13 @@ public class SharedData extends Thread{
 		System.out.println("Shareddata processPayload message received:"+msgType);
 		switch (msgType) {
 		case CHOKE:
-			LoggerUtil.getInstance().logChokingNeighbor(getTime(),connection.getRemotePeerId(), peerProcess.getPeerId());
+			LoggerUtil.getInstance().logChokingNeighbor(getTime(),peerProcess.getPeerId(),connection.getRemotePeerId());
 			connection.removeRequestedPieces(connection);
 			responseMsgType = null;
 			break;
 		case UNCHOKE:
 			// respond with request
-			LoggerUtil.getInstance().logUnchokingNeighbor(getTime(), connection.getRemotePeerId(), peerProcess.getPeerId());
+			LoggerUtil.getInstance().logUnchokingNeighbor(getTime(), peerProcess.getPeerId(),connection.getRemotePeerId());
 			responseMsgType = MsgType.REQUEST;
 			pieceIndex = splitFile.getRequestPieceIndex(connection);
 			if(pieceIndex!=Integer.MIN_VALUE)
