@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.nio.ByteBuffer;
 
 import com.ufl.cise.cnt5106.SharedData;
@@ -78,10 +79,13 @@ public class DataIn implements Runnable {
 		try {
 			instream.readFully(messageLength);
 		}
-		catch(Exception e) {
+		catch(SocketException socketException) {
 			System.out.println("Received file");
 			isAlive=false;
 			System.exit(0);
+		}
+		catch(Exception e) {
+			e.printStackTrace();
 		}
 	}
 
