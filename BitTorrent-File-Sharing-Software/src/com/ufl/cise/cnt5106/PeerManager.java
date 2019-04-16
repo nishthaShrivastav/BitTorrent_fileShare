@@ -24,7 +24,6 @@ public class PeerManager{
 	private PayloadProcess payloadProcess;
 	PeerInfoProperties peerInfo = new PeerInfoProperties();
 	private int optUnchokingInterval = Common.getOptimisticUnchokingInterval();
-	PriorityQueue<Connection> preferredNeighbors;
 
 	private PeerManager() {
 
@@ -102,14 +101,14 @@ public class PeerManager{
 			@Override
 			public void run() {
 				System.out.println("start opt unchoking after a sleep");
-				if(null!=allConnections && null!= interested && null!=preferredNeighbors && !allConnections.isEmpty() && interested.size()>preferredNeighbors.size()) {
+				if(null!=allConnections && null!= interested && null!=prefNeighbors && !allConnections.isEmpty() && interested.size()>prefNeighbors.size()) {
 					Collections.shuffle(allConnections);
 					for (Connection conn : allConnections) {
-						System.out.println("shuffled connections and iterating, interested empty, prefN empty"+interested.isEmpty()+" "+preferredNeighbors.isEmpty());
-						if (interested.contains(conn) && !preferredNeighbors.contains(conn) && !conn.hasFile()) {
+						System.out.println("shuffled connections and iterating, interested empty, prefN empty"+interested.isEmpty()+" "+prefNeighbors.isEmpty());
+						if (interested.contains(conn) && !prefNeighbors.contains(conn) && !conn.hasFile()) {
 							System.out.println("opt Unchoke neighbor "+conn.remotePeerId);
 							payloadProcess.addMessage(new Object[] { conn, Message.MsgType.UNCHOKE, Integer.MIN_VALUE });
-							preferredNeighbors.add(conn);
+							prefNeighbors.add(conn);
 							System.out.println("Optimistic unchoke done for peer "+conn.remotePeerId);
 							LoggerUtil.getInstance().logOptimisticallyUnchokeNeighbor(getTime(), peerProcess.getPeerId(),conn.getRemotePeerId());
 							break;
