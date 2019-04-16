@@ -41,6 +41,7 @@ public class SharedData extends Thread{
 		payloadProcess= PayloadProcess.getInstance();
 		peerBitset = new BitSet(Common.getNumberOfPieces());
 		peermgr = PeerManager.getPeerManager();
+		peerHasFile=splitFile.isCompleteFile();
 	}
 	
 	public void setUpload(Upload val) {
