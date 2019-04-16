@@ -1,8 +1,5 @@
 package com.ufl.cise.conf;
 
-/*
- * This class reads the PeerInfo.cfg file
- * */
 import java.io.BufferedReader;
 
 
@@ -13,14 +10,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 
-/*
- * class to read peer info config file
- * read from file split and stored 
- * the information of peers into a linked list vector
- * 
- * write function to get peerid as well 
- */
-public class PeerInfoProperties {
+public class PeerInfo {
 
 	 private final static Collection<RemotePeerInfo> allPeers = new LinkedList<>();
 	 

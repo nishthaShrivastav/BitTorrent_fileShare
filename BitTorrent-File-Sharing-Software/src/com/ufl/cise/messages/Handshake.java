@@ -1,4 +1,4 @@
-package com.ufl.cise.cnt5106;
+package com.ufl.cise.messages;
 import java.util.Arrays;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 
 // This program has basic handshake functions 
 public class Handshake {
+	
 	private static String message = "";
 	private static final String HANDSHAKE_HEADER = "P2PFILESHARINGPROJ0000000000";
 	
@@ -13,29 +14,33 @@ public class Handshake {
 	public static synchronized String get_Remote_PId(byte[] a) {
 		String id = "";
 		
-		int to = a.length;
-		int from = to - 4;
-		byte[] bytes = Arrays.copyOfRange(a, from, to);
-		String string = new String(bytes, StandardCharsets.UTF_8);
-		return string;
+		int endId = a.length;
+		int startId = endId - 4;
+		byte[] idBytes = Arrays.copyOfRange(a, startId, endId);
+		
+		String idString = new String(idBytes, StandardCharsets.UTF_8);
+		return idString;
 				
 	}
 
 	public static synchronized byte[] message_get() {
-		byte[] hand_shake = new byte[32];
+		
+		byte[] handshake = new byte[32];
 		ByteBuffer Bb = ByteBuffer.wrap(message.getBytes());
 		
-		Bb.get(hand_shake);
-		return hand_shake;
+		Bb.get(handshake);
+		return handshake;
 	}
-	private static synchronized void init(String id) {
+	
+	private static synchronized void initHandshake(String id) {
 		message += HANDSHAKE_HEADER + id;
 	}
 
 
 	public static synchronized void set_Id(String id) {
-		init(id);
+		initHandshake(id);
 	}
+	
 	public static synchronized String get_Id(byte[] message) {
 		byte[] remote_PeerId = Arrays.copyOfRange(message, message.length - 4, message.length);
 		return new String(remote_PeerId);

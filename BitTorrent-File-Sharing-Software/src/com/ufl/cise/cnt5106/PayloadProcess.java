@@ -6,20 +6,20 @@ import com.ufl.cise.messages.*;
 
 public class PayloadProcess extends Thread {
 
-	private LinkedBlockingQueue<Object[]> queue;
+	private LinkedBlockingQueue<Object[]> messageQueue;
 	private MessageHandler messageHandler;
-	private int piece_index;
+	private int pieceIndex;
 	private Connection connection;
 	private Message.MsgType msgType;
 	private static PayloadProcess payloadProcess;
 
 
 	private PayloadProcess() {
-		queue = new LinkedBlockingQueue<>();
+		messageQueue = new LinkedBlockingQueue<>();
 		messageHandler = MessageHandler.getInstance();
 		msgType = null;
 		connection = null;
-		piece_index = Integer.MIN_VALUE;
+		pieceIndex = Integer.MIN_VALUE;
 	}
 	public static synchronized PayloadProcess getInstance() {
 		if (payloadProcess == null) {
@@ -29,11 +29,10 @@ public class PayloadProcess extends Thread {
 		return payloadProcess;
 	}
 
-	protected synchronized void addMessage(Object[] input) {
+	protected synchronized void addMessagetoQueue(Object[] input) {
 		try {
-			queue.put(input);
+			messageQueue.put(input);
 		} catch (InterruptedException e) {
-			System.out.println("Exception in addMessage PayloadProcess"+e);
 			e.printStackTrace();
 		}
 	}
@@ -42,28 +41,26 @@ public class PayloadProcess extends Thread {
 	public void run() {
 		while (true) {
 			System.out.println("PayloadProcess run started");
-			Object[] input = retrieveMessage();
-			connection = (Connection) input[0];
-			msgType = (Message.MsgType) input[1];
-			piece_index = (int) input[2];
-			/*	System.out.println(
-				"Broadcaster: Building " + message + piece_index + " to peer " + connection.getRemotePeerId())*/
-			int messageLength = messageHandler.getMessageLength(msgType, piece_index);
-			byte[] payload = messageHandler.getPayload(msgType, piece_index);
+			Object[] inputMessage = getMessage();
+			connection = (Connection) inputMessage[0];
+			msgType = (Message.MsgType) inputMessage[1];
+			pieceIndex = (int) inputMessage[2];
+			int messageLength = messageHandler.getMessageLength(msgType, pieceIndex);
+			byte[] payload = messageHandler.getMessageContent(msgType, pieceIndex);
 			connection.sendMessage(messageLength, payload);
 			System.out.println("PayloadProcess: Sending " + msgType + " to peer ") ;
 
 		}
 	}
-	private Object[] retrieveMessage() {
-		Object[] input = null;
+	private Object[] getMessage() {
+		Object[] inputMessage = null;
 		try {
 			System.out.println("payloadprocess waiting on queue");
-			input = queue.take();
+			inputMessage = messageQueue.take();
 			System.out.println("Payloadprocess popped from queue");
 		} catch (InterruptedException e) {
-			System.out.println("Exception in retreiveMessage PayloadProcess"+e);
+			e.printStackTrace();
 		}
-		return input;
+		return inputMessage;
 	}
 }

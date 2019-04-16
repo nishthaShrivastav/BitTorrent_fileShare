@@ -1,4 +1,4 @@
-package com.ufl.cise.cnt5106;
+package com.ufl.cise.datastreams;
 
 import java.io.DataInputStream;
 import java.io.EOFException;
@@ -6,27 +6,30 @@ import java.io.IOException;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
-public class Download implements Runnable {
+import com.ufl.cise.cnt5106.SharedData;
 
-	Socket socket;
+public class DataIn implements Runnable {
+// Download as Data In 
+	Socket insocket;
 	private SharedData sharedData;
 	private boolean isAlive;
-	private DataInputStream in;
+	private DataInputStream instream;
 
-	public Download(Socket socket, SharedData data) {
+	//init server client input streams
+	public DataIn(Socket socket, SharedData data) {
 		init(socket, data);
 	}
-	public Download(Socket socket, String peerid,SharedData data) {
+	public DataIn(Socket socket, String peerId,SharedData data) {
 		init(socket, data);
 	}
 	
 
 	private void init(Socket socket, SharedData data) {
-		this.socket = socket;
+		this.insocket = socket;
 		sharedData = data;
 		isAlive = true;
 		try {
-			in = new DataInputStream(socket.getInputStream());
+			instream = new DataInputStream(socket.getInputStream());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -35,34 +38,34 @@ public class Download implements Runnable {
 
 	@Override
 	public void run() {
-		System.out.println("Download run started");
+		System.out.println("DataIn run started");
 
 		while (isAlive()) {
 			System.out.println("is alive");
 			int messageLength = Integer.MIN_VALUE;
-			messageLength = receiveMessageLength();
+			messageLength = findMessageLength();
 			if (!isAlive()) {
 				continue;
 			}
 			byte[] payload = new byte[messageLength];
-			receiveMessagePayload(payload);
-			System.out.println("Received message and adding payload to shareddata" +socket.getPort());
+			takeinMessage(payload);
+			System.out.println("Received message and adding payload to shareddata" +insocket.getPort());
 			sharedData.addPayload(payload);
 
 		}
 
 	}
 
-	private void receiveMessagePayload(byte[] payload) {
-		receiveRawData(payload);
+	private void takeinMessage(byte[] payload) {
+		dataIn(payload);
 
 	}
 
-	private int receiveMessageLength() {
+	private int findMessageLength() {
 		int len = Integer.MIN_VALUE;
 		byte[] messageLength = new byte[4];
 		try {
-			receiveRawData(messageLength);
+			dataIn(messageLength);
 			len = ByteBuffer.wrap(messageLength).getInt();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -70,9 +73,9 @@ public class Download implements Runnable {
 		return len;
 
 	}
-	private void receiveRawData(byte[] messageLength) {
+	private void dataIn(byte[] messageLength) {
 		try {
-			in.readFully(messageLength);
+			instream.readFully(messageLength);
 		} catch (EOFException e) {
 			System.exit(0);
 		} catch (IOException e) {

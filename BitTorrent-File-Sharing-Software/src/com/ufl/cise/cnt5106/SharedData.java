@@ -8,9 +8,11 @@ import java.util.PriorityQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import com.ufl.cise.conf.Common;
+import com.ufl.cise.datastreams.DataOut;
+import com.ufl.cise.logsconstants.LoggerUtil;
+import com.ufl.cise.messages.Handshake;
 import com.ufl.cise.messages.Message;
 import com.ufl.cise.messages.Message.MsgType;
-
 import com.ufl.cise.messages.MessageHandler;
 
 
@@ -20,11 +22,11 @@ public class SharedData extends Thread{
 	private boolean isAlive;
 	private Peer host = Peer.getInstance();
 	private String remotePeerId;
-	private splitFile splitFile;
+	private SplitFile splitFile;
 	private BitSet peerBitset;
 	private Connection connection;
 	private volatile boolean uploadHandshake;
-	private Upload upload;
+	private DataOut upload;
 	private boolean bitfieldSent;
 	private boolean isHandshakeDownloaded;
 	private MessageHandler messagehandler;
@@ -40,16 +42,16 @@ public class SharedData extends Thread{
 		splitFile = splitFile.getInstance();
 		payloadProcess= PayloadProcess.getInstance();
 		peerBitset = new BitSet(Common.getNumberOfPieces());
-		peermgr = PeerManager.getPeerManager();
+		peermgr = PeerManager.getPeerManagerInstance();
 		peerHasFile=splitFile.isCompleteFile();
 	}
 	
-	public void setUpload(Upload val) {
+	public void setUploadHandshake(DataOut val) {
 		// put message in the queue to send handshake (broadcaster queue)
 		upload = val;
 		if (getUploadHandshake()) {
 			Object[] msg =  { connection, Message.MsgType.HANDSHAKE, Integer.MIN_VALUE };
-			payloadProcess.addMessage(msg);
+			payloadProcess.addMessagetoQueue(msg);
 		}
 	}
 
@@ -75,7 +77,7 @@ public class SharedData extends Thread{
 		}
 		
 	}
-	//merge send and setupload later
+	
 	public synchronized void sendHandshake() {
 		setUploadHandshake();
 	}
@@ -84,28 +86,24 @@ public class SharedData extends Thread{
 		uploadHandshake = true;
 	}
 	
-
 	public synchronized boolean getUploadHandshake() {
 		return uploadHandshake; 
 	}
 
-
-
 	private void processPayload(byte[] p) {
-		System.out.println("payload[0]= "+p[0]);
 		MsgType msgType = getMessageType(p[0]);
 		MsgType responseMsgType = null;
 		int pieceIndex = Integer.MIN_VALUE;
 		System.out.println("Shareddata processPayload message received:"+msgType);
 		switch (msgType) {
 		case CHOKE:
-			LoggerUtil.getInstance().logChokingNeighbor(getTime(),peerProcess.getPeerId(),connection.getRemotePeerId());
+			LoggerUtil.getLoggerInstance().logChokingNeighbor(getTime(),peerProcess.getPeerId(),connection.getRemotePeerId());
 			connection.removeRequestedPieces(connection);
 			responseMsgType = null;
 			break;
 		case UNCHOKE:
 			// respond with request
-			LoggerUtil.getInstance().logUnchokingNeighbor(getTime(), peerProcess.getPeerId(),connection.getRemotePeerId());
+			LoggerUtil.getLoggerInstance().logUnchokingNeighbor(getTime(), peerProcess.getPeerId(),connection.getRemotePeerId());
 			responseMsgType = MsgType.REQUEST;
 			pieceIndex = splitFile.getRequestPieceIndex(connection);
 			if(pieceIndex!=Integer.MIN_VALUE)
@@ -113,14 +111,14 @@ public class SharedData extends Thread{
 			break;
 		case INTERESTED:
 			// add to interested connections
-			LoggerUtil.getInstance().logReceivedInterestedMessage(getTime(), peerProcess.getPeerId(),connection.getRemotePeerId());
+			LoggerUtil.getLoggerInstance().logReceivedInterestedMessage(getTime(), peerProcess.getPeerId(),connection.getRemotePeerId());
 			connection.addInterestedConnection();
 			responseMsgType = null;
 			break;
 		case NOTINTERESTED:
 			// add to not interested connections
-			LoggerUtil.getInstance().logReceivedNotInterestedMessage(getTime(), peerProcess.getPeerId(),
-					connection.getRemotePeerId());
+			LoggerUtil.getLoggerInstance().logReceivedNotInterestedMessage(getTime(), peerProcess.getPeerId(),
+			connection.getRemotePeerId());
 			connection.addNotInterestedConnection();
 			responseMsgType = null;
 			break;
@@ -128,21 +126,20 @@ public class SharedData extends Thread{
 			// update peer bitset
 			// send interested/not interested
 			pieceIndex = ByteBuffer.wrap(p, 1, 4).getInt();
-			LoggerUtil.getInstance().logReceivedHaveMessage(getTime(), peerProcess.getPeerId(), connection.getRemotePeerId(),
+			LoggerUtil.getLoggerInstance().logReceivedHaveMessage(getTime(), peerProcess.getPeerId(), connection.getRemotePeerId(),
 					pieceIndex);
-			updatePeerBitset(pieceIndex);
+			updateRemotePeerBitset(pieceIndex);
 			if(isInterested()) {
 				responseMsgType= MsgType.INTERESTED;
 			}
 			else {
 				responseMsgType=MsgType.NOTINTERESTED;
 			}
-
 			break;
 		case BITFIELD:
 			// update peer bitset
 			// send interested/not interested
-			setPeerBitset(p);
+			setRemotePeerBitset(p);
 			if(isInterested()) {
 				responseMsgType= MsgType.INTERESTED;
 			}
@@ -176,19 +173,17 @@ public class SharedData extends Thread{
 			 */
 			pieceIndex = ByteBuffer.wrap(p, 1, 4).getInt();
 			connection.addToBytesDownloaded(p.length);
-
-
 			splitFile.setPiece(Arrays.copyOfRange(p, 1, p.length));
-			LoggerUtil.getInstance().logDownloadedPiece(getTime(), peerProcess.getPeerId(), connection.getRemotePeerId(),
+			LoggerUtil.getLoggerInstance().logDownloadedPiece(getTime(), peerProcess.getPeerId(), connection.getRemotePeerId(),
 					pieceIndex, splitFile.getReceivedFileSize());
 			responseMsgType = MsgType.REQUEST;
-			connection.tellAllNeighbors(pieceIndex);
+			connection.sendHavetoAll(pieceIndex);
 			connection.removeRequestedPiece(pieceIndex);
 			pieceIndex = splitFile.getRequestPieceIndex(connection);
 			if(pieceIndex!=Integer.MIN_VALUE)
 				connection.addRequestedPiece(pieceIndex);
 			else {
-				LoggerUtil.getInstance().logFinishedDownloading(getTime(), peerProcess.getPeerId());
+				LoggerUtil.getLoggerInstance().logFinishedDownloading(getTime(), peerProcess.getPeerId());
 				splitFile.writeToFile(peerProcess.getPeerId());
 				msgType = null;
 				isAlive = false;
@@ -204,9 +199,9 @@ public class SharedData extends Thread{
 			if (!getUploadHandshake()) {
 				setUploadHandshake();
 				System.out.println("Setting uploadHandshake with peer "+remotePeerId);
-				LoggerUtil.getInstance().logTcpConnectionFrom(host.getPeerInfo().getPeerId(), remotePeerId);
+				LoggerUtil.getLoggerInstance().logTcpConnectionFrom(host.getPeerInfo().getPeerId(), remotePeerId);
 				System.out.println("Sending handshake response to "+remotePeerId);
-				payloadProcess.addMessage(new Object[] { connection, MsgType.HANDSHAKE, Integer.MIN_VALUE });
+				payloadProcess.addMessagetoQueue(new Object[] { connection, MsgType.HANDSHAKE, Integer.MIN_VALUE });
 			}
 			if (splitFile.hasAnyPieces()) {
 				responseMsgType = MsgType.BITFIELD;
@@ -216,7 +211,7 @@ public class SharedData extends Thread{
 		System.out.println("Sending response messagetype :"+responseMsgType+"to "+remotePeerId);
 		if (null != responseMsgType) {
 
-			payloadProcess.addMessage(new Object[] { connection, responseMsgType, pieceIndex });
+			payloadProcess.addMessagetoQueue(new Object[] { connection, responseMsgType, pieceIndex });
 		}
 
 	}
@@ -258,28 +253,27 @@ public class SharedData extends Thread{
 	}
 	
 	public boolean hasFile() {
-	
 		return peerHasFile;
 	}
 	
-	public synchronized void setPeerBitset(byte[] payload) {
-		for (int i = 1; i < payload.length; i++) {
-			if (payload[i] == 1) {
+	public synchronized void setRemotePeerBitset(byte[] remoteBitSet) {
+		for (int i = 1; i < remoteBitSet.length; i++) {
+			if (remoteBitSet[i] == 1) {
 				peerBitset.set(i - 1);
 			}
 		}
 		//if the peerbitset values are 1 for all pieces it means all pieces are received
 		if (peerBitset.cardinality() == Common.getNumberOfPieces()) {
 			peerHasFile = true;
-			PeerManager.getPeerManager().addToFullFileList(remotePeerId);
+			PeerManager.getPeerManagerInstance().addToFullFileList(remotePeerId);
 		}
 	}
 	
 	//updatePeerBitset and setPeerbitset has partial code same
-	public synchronized void updatePeerBitset(int index) {
-		peerBitset.set(index);
+	public synchronized void updateRemotePeerBitset(int newPiecevalue) {
+		peerBitset.set(newPiecevalue);
 		if (peerBitset.cardinality() == Common.getNumberOfPieces()) {
-			PeerManager.getPeerManager().addToFullFileList(remotePeerId);
+			PeerManager.getPeerManagerInstance().addToFullFileList(remotePeerId);
 			peerHasFile = true;
 		}
 	}

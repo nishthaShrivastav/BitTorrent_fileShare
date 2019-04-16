@@ -1,30 +1,30 @@
-package com.ufl.cise.cnt5106;
+package com.ufl.cise.messages;
 
 import java.util.*;
 
+import com.ufl.cise.cnt5106.SplitFile;
 import com.ufl.cise.conf.Common;
-import com.ufl.cise.messages.Message;
 
 public class Bitfield extends Message {
 
 		private static Bitfield Bitfield;
-		private splitFile spFile;
+		private SplitFile splitFile;
 
 		private Bitfield() {
-			getBitfield();
+			getBitfieldContent();
 		}
 		
-		private void getBitfield() {
+		private void getBitfieldContent() {
 			msgNum= 5;
 			int numPieces = Common.getNumberOfPieces(); 
-			payload = new byte[numPieces+1];
+			messageContent = new byte[numPieces+1];
 			content = new byte[numPieces];
-			spFile = splitFile.getInstance();
-			payload[0] = msgNum;
-			BitSet filePieces = splitFile.getFilePieces();
+			splitFile = SplitFile.getInstance();
+			messageContent[0] = msgNum;
+			BitSet filePieces = SplitFile.getFilePieces();
 			for (int i = 0; i < numPieces; i++) {
 				if (filePieces.get(i)) {
-					payload[i + 1] = 1;
+					messageContent[i + 1] = 1;
 				}
 			}
 		
@@ -39,13 +39,13 @@ public class Bitfield extends Message {
 
 		@Override
 		public synchronized int getMessageLength() {
-			getBitfield();
-			return payload.length;
+			getBitfieldContent();
+			return messageContent.length;
 		}
 
 		@Override
-		public synchronized byte[] getPayload() {
-			return payload;
+		public synchronized byte[] getMessageContent() {
+			return messageContent;
 		}
 
 	}

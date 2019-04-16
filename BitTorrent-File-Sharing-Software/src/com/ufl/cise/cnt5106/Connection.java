@@ -4,23 +4,52 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.BitSet;
 
+import com.ufl.cise.datastreams.DataIn;
+import com.ufl.cise.datastreams.DataOut;
+import com.ufl.cise.logsconstants.LoggerUtil;
+
 public class Connection {
-	Upload upload;
-	Download download;
+	
+	DataOut dataOut;
+	DataIn dataIn;
 	Socket peerSocket;
 	SharedData sharedData;
 	double bytesDownloaded;
 	String remotePeerId;
 	boolean isPeerChoked;
-	private PeerManager peerManager = PeerManager.getPeerManager();
+	private PeerManager peerManager = PeerManager.getPeerManagerInstance();
 
-	// download yet to be written 
+	public Connection(Socket peerSocket) {
+
+		this.peerSocket = peerSocket;
+		sharedData = new SharedData(this);
+		dataOut = new DataOut(peerSocket, sharedData);
+		dataIn= new DataIn(peerSocket,sharedData);
+		setChannels(dataOut, dataIn);
+		sharedData.setUploadHandshake(dataOut);
+		sharedData.start();
+	}
+	
+	public Connection(Socket peerSocket, String peerId) {
+		this.peerSocket = peerSocket;
+		sharedData = new SharedData(this);
+		dataOut = new DataOut(peerSocket, peerId,sharedData);
+		dataIn = new DataIn(peerSocket,peerId,sharedData);
+		System.out.println("about to create up down threads, connection th "+Thread.currentThread().getName());
+		setChannels(dataOut, dataIn);
+		LoggerUtil.getLoggerInstance().logTcpConnectionTo(Peer.getInstance().getPeerInfo().getPeerId(), peerId);
+		System.out.println("Sending handshake to "+peerId);
+		sharedData.sendHandshake();
+		sharedData.setUploadHandshake(dataOut);
+		sharedData.start();
+	}
+	
 	public double getBytesDownloaded() {
 		return bytesDownloaded;
 	}
 
-	protected Upload getUpload() {
-		return upload;
+	protected DataOut getUpload() {
+		return dataOut;
 	}
 
 	public synchronized void addToBytesDownloaded(long value) {
@@ -30,46 +59,20 @@ public class Connection {
 		return isPeerChoked;
 	}
 	
-	public Connection(Socket peerSocket) {
-		System.out.println("This connection");
-		this.peerSocket = peerSocket;
-		sharedData = new SharedData(this);
-		upload = new Upload(peerSocket, sharedData);
-		download= new Download(peerSocket,sharedData);
-		createThreads(upload, download);
-		sharedData.setUpload(upload);
-		sharedData.start();
-	}
-	
-	public Connection(Socket peerSocket, String peerId) {
-		this.peerSocket = peerSocket;
-		sharedData = new SharedData(this);
-		upload = new Upload(peerSocket, peerId,sharedData);
-		download = new Download(peerSocket,peerId,sharedData);
-		System.out.println("about to create up down threads, connection th "+Thread.currentThread().getName());
-		createThreads(upload, download);
-		System.out.println("back to connection");
-		LoggerUtil.getInstance().logTcpConnectionTo(Peer.getInstance().getPeerInfo().getPeerId(), peerId);
-		System.out.println("Sending handshake to "+peerId);
-		sharedData.sendHandshake();
-		sharedData.setUpload(upload);
-		sharedData.start();
-	}
-	private void createThreads(Upload upload, Download download) {
-		Thread uploadThread = new Thread(upload);
-		Thread downloadThread = new Thread(download);
-		uploadThread.start();
-		downloadThread.start();
+	private void setChannels(DataOut dataOut, DataIn download) {
+		Thread dataOutThread = new Thread(dataOut);
+		Thread dataInThread = new Thread(download);
+		dataOutThread.start();
+		dataInThread.start();
 		
 	}
-	
 	
 	public void setPeerId(String val) {
 		remotePeerId=val;
 	}
 
-	public synchronized void sendMessage(int msgLen, byte[] payload) {
-		upload.addMessage(msgLen, payload);
+	public synchronized void sendMessage(int messageLength, byte[] messageContent) {
+		dataOut.addMessagetoQueue(messageLength, messageContent);
 	}
 
 	public void addAllConnections() {
@@ -80,18 +83,9 @@ public class Connection {
 	public String getRemotePeerId() {
 		return remotePeerId;
 	}
-
-	public void close() {
-		try {
-			peerSocket.close();
-		} catch (IOException e) {
-			System.out.println("Exception in Connection close"+e);
-		}
-	}
-
 	
 	protected synchronized void addRequestedPiece(int pieceIndex) {
-		splitFile.getInstance().addRequestedPiece( pieceIndex,this);
+		SplitFile.getInstance().addRequestedPiece( pieceIndex,this);
 	}
 
 	public BitSet getPeerBitSet() {
@@ -99,11 +93,11 @@ public class Connection {
 	}
 
 	public void removeRequestedPiece(int pieceIndex) {
-		splitFile.getInstance().removeRequestedPiece(pieceIndex,this);
+		SplitFile.getInstance().removeRequestedPiece(pieceIndex,this);
 	}
 	
 	public void removeRequestedPieces(Connection connection) {
-		splitFile.getInstance().removeRequestedPieces(this);
+		SplitFile.getInstance().removeRequestedPieces(this);
 	}
 
 	public void addInterestedConnection() {
@@ -115,8 +109,8 @@ public class Connection {
 		peerManager.addNotInterestedConnection(remotePeerId, this);
 	}
 
-	public void tellAllNeighbors(int pieceIndex) {
-		peerManager.tellAllNeighbors(pieceIndex);
+	public void sendHavetoAll(int pieceIndex) {
+		peerManager.sendHavetoAll(pieceIndex);
 		
 	}
 	public synchronized boolean hasFile() {
@@ -125,6 +119,5 @@ public class Connection {
 	public synchronized void setDownloadedbytes(int n) {
 		bytesDownloaded = n;
 	}
-
 
 }

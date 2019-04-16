@@ -2,25 +2,17 @@ package com.ufl.cise.messages;
 
 import java.nio.ByteBuffer;
 
-import com.ufl.cise.cnt5106.Bitfield;
-import com.ufl.cise.cnt5106.Handshake;
-import com.ufl.cise.cnt5106.splitFile;
+import com.ufl.cise.cnt5106.SplitFile;
 import com.ufl.cise.messages.Message.MsgType;
 
-/*
- * class to handle types of messages 
- * 
- * cases to understand the messages and get the actual payload. 
- * 
- */
 
 public class MessageHandler {
 	public static MessageHandler messageHandler;
-	private splitFile splitFie;
+	private SplitFile splitFile;
 	
 	
 	private MessageHandler() {
-		splitFile.getInstance();
+		SplitFile.getInstance();
 	}
 	public static synchronized MessageHandler getInstance() {
 		if(messageHandler==null) {
@@ -68,15 +60,15 @@ public class MessageHandler {
 		case HANDSHAKE:
 			return 32;
 		case PIECE:
-			if(splitFile.getPiece(pieceIndex) !=null) {
-				int payloadLength = 5 + splitFile.getPiece(pieceIndex).length;
+			if(SplitFile.getPiece(pieceIndex) !=null) {
+				int payloadLength = 5 + SplitFile.getPiece(pieceIndex).length;
 				return payloadLength;
 			}
 		}
 		return -1;
 	}
 	
-	public synchronized byte[] getPayload(MsgType messageType, int pieceIndex) {
+	public synchronized byte[] getMessageContent(MsgType messageType, int pieceIndex) {
 		byte[] payload = new byte[5];
 		switch(messageType) {
 		case CHOKE:
@@ -94,7 +86,7 @@ public class MessageHandler {
 			break;
 		case BITFIELD:
 			Bitfield bitfield = Bitfield.getInstance();
-			payload = bitfield.getPayload();
+			payload = bitfield.getMessageContent();
 			break;
 		case REQUEST:
 			payload[0] = 6;
@@ -104,7 +96,7 @@ public class MessageHandler {
 		case HANDSHAKE:
 			return Handshake.message_get();
 		case PIECE:
-			byte[] piece = splitFile.getPiece(pieceIndex);
+			byte[] piece = SplitFile.getPiece(pieceIndex);
 			int pieceSize = piece.length;
 			int totalLength = 5 + pieceSize;
 			payload = new byte[totalLength];

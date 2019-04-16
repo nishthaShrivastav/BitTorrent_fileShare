@@ -3,17 +3,9 @@ package com.ufl.cise.cnt5106;
 import java.io.*;
 import java.util.*;
 import com.ufl.cise.conf.*;
-/*
- * main function to start program
- * 
- * peer id has argument 
- * read common config file
- * read peer config file
- * 
- * identify peers to communicate with and 
- * create process to communicate  
- * 
- */
+import com.ufl.cise.logsconstants.Constants;
+import com.ufl.cise.messages.Handshake;
+
 public class peerProcess {
 	private static int peerId;
 
@@ -25,7 +17,7 @@ public class peerProcess {
 
 		peerId = Integer.parseInt(args[0]);
 		Reader peerReader = null;
-		PeerInfoProperties peerInfo = new PeerInfoProperties();
+		PeerInfo peerInfo = new PeerInfo();
 		Collection<RemotePeerInfo> peersToConnect= new LinkedList<>();
 		
 		try {
@@ -33,14 +25,16 @@ public class peerProcess {
 			peerReader = new FileReader(Constants.SOURCE_FILE_PATH+Constants.PEER_CONFIG_FILE_NAME);
 			peerInfo.read(peerReader);
 			Handshake.set_Id(args[0]);
-			if((PeerInfoProperties.getPeer(peerId)).hasFile()) {
-				splitFile sp=splitFile.getInstance();
-				sp.split();
+			if((PeerInfo.getPeer(peerId)).hasFile()) {
+				SplitFile splitFile=SplitFile.getInstance();
+				System.out.println("split file returned");
+				splitFile.split();
 			}
+		
 			Peer peer = Peer.getInstance();
 			System.out.println("Peer "+peerId+" starting connections");
-			peer.TCPConnections();
-			peer.connectToPeers();
+			peer.sendConnections();
+			peer.listenforConnections();
 		}
 		catch(Exception e){
 			e.printStackTrace();

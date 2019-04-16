@@ -3,13 +3,11 @@ package com.ufl.cise.cnt5106;
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
-import com.ufl.cise.conf.*;
-/*
- * Peer consists of RemotePeerInfo , peerManager
- * */
 
+import com.ufl.cise.conf.*;
 
 public class Peer {
+	
 	private static Peer client = new Peer();
 	private RemotePeerInfo myPeerInfo;
 	private PeerManager peerManager; 
@@ -17,8 +15,8 @@ public class Peer {
 	public int peerID;
 	
 	private Peer() {
-		myPeerInfo = PeerInfoProperties.getPeer(peerProcess.getPeerId());
-		peerManager = PeerManager.getPeerManager();
+		myPeerInfo = PeerInfo.getPeer(peerProcess.getPeerId());
+		peerManager = PeerManager.getPeerManagerInstance();
 		peerID=peerProcess.getPeerId();
 	}
 	
@@ -33,14 +31,17 @@ public class Peer {
 	public void setPeerInfo(RemotePeerInfo peerInfo) {
 		this.myPeerInfo = peerInfo;
 	}
+	
 	public int getPeerID() {
 		return peerID;
 	}
-	public void connectToPeers() throws IOException {
+	
+	public void listenforConnections() throws IOException {
 
 		ServerSocket socket = null;
 		try {
 			socket = new ServerSocket(myPeerInfo.getPeerPort());
+			
 			//continue while all peers are yet to receive the file
 			while (false == allPeersReceivedFiles) {
 				Socket clientSocket = socket.accept();
@@ -55,15 +56,15 @@ public class Peer {
 		}
 	}
 
-	public void TCPConnections() {
-		Collection<RemotePeerInfo> peers=PeerInfoProperties.getPeerInfo();
+	public void sendConnections() {
+		Collection<RemotePeerInfo> peers=PeerInfo.getPeerInfo();
 		for(RemotePeerInfo pi : peers) {
 			if(pi.getId()<myPeerInfo.getId()) {
 				new Thread() {
 					@Override
 					public void run() {
 						System.out.println("Starting connection with"+pi.getHostName());
-						createPeerConnection(pi);
+						sendConnectionRequest(pi);
 					}
 				}.start();
 		}
@@ -72,7 +73,7 @@ public class Peer {
 	
 }
 
-	public void createPeerConnection(RemotePeerInfo pi) {
+	public void sendConnectionRequest(RemotePeerInfo pi) {
 		int peerPort = pi.getPeerPort();
 		String peerHost= pi.getHostName();
 		try {
