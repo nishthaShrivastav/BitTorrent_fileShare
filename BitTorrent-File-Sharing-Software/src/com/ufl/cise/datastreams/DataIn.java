@@ -53,6 +53,7 @@ public class DataIn implements Runnable {
 			sharedData.addPayload(payload);
 
 		}
+		System.out.println("Dead");
 
 	}
 
@@ -76,10 +77,11 @@ public class DataIn implements Runnable {
 	private void dataIn(byte[] messageLength) {
 		try {
 			instream.readFully(messageLength);
-		} catch (EOFException e) {
+		}
+		catch(Exception e) {
+			System.out.println("Received file");
+			isAlive=false;
 			System.exit(0);
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 

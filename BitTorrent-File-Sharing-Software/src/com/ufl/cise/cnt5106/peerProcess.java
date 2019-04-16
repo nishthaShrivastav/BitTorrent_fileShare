@@ -11,7 +11,7 @@ public class peerProcess {
 
 	public static void main(String[] args) throws Exception {
 
-		if(args.length!=1) {
+		if(args==null || (args!=null &&args.length!=1)) {
 			throw new Exception("The number of arguments passed is  "+args.length+" but the required length is 1");
 		}
 
@@ -19,7 +19,7 @@ public class peerProcess {
 		Reader peerReader = null;
 		PeerInfo peerInfo = new PeerInfo();
 		Collection<RemotePeerInfo> peersToConnect= new LinkedList<>();
-		
+
 		try {
 			new LoadProperties();
 			peerReader = new FileReader(Constants.SOURCE_FILE_PATH+Constants.PEER_CONFIG_FILE_NAME);
@@ -30,7 +30,7 @@ public class peerProcess {
 				System.out.println("split file returned");
 				splitFile.split();
 			}
-		
+
 			Peer peer = Peer.getInstance();
 			System.out.println("Peer "+peerId+" starting connections");
 			peer.sendConnections();
@@ -46,7 +46,6 @@ public class peerProcess {
 			catch(Exception e) {
 				e.printStackTrace();
 			}
-
 		}
 	}
 	public static int getPeerId() {

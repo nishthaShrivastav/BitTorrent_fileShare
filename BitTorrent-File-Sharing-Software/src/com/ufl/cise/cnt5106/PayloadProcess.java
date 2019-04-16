@@ -57,7 +57,6 @@ public class PayloadProcess extends Thread {
 		try {
 			System.out.println("payloadprocess waiting on queue");
 			inputMessage = messageQueue.take();
-			System.out.println("Payloadprocess popped from queue");
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

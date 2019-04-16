@@ -53,7 +53,6 @@ public class DataOut implements Runnable {
 				byte[] payload = dataoutpayloadqueue.take();
 				outstream.write(payload);
 				outstream.flush();
-				System.out.println("Written to socket out stream of "+socket.getPort());
 			} catch (SocketException e) {
 				isAlive = false;
 			} catch (Exception e) {
@@ -66,7 +65,6 @@ public class DataOut implements Runnable {
 	public void addMessagetoQueue(int len, byte[] payload) {
 		try {
 			dataoutlengthqueue.put(len);
-			System.out.println("payload[0] sending form upload thread"+payload[0]);
 			dataoutpayloadqueue.put(payload);
 		} catch (InterruptedException e) {
 			e.printStackTrace();

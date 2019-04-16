@@ -214,7 +214,6 @@ public class SplitFile extends Thread{
 		}
 		myClone.flip(0, numberOfPieces);
 		myClone.and(peerClone);
-		System.out.println(peerClone + " " + myClone);
 		int[] missingPieces = myClone.stream().toArray();
 		int askpieceindex=new Random().nextInt(missingPieces.length);
 		while(requestedPieces.containsKey(askpieceindex)) {

@@ -2,7 +2,6 @@ package com.ufl.cise.cnt5106;
 
 import java.net.Socket;
 import java.util.*;
-
 import com.ufl.cise.conf.*;
 import com.ufl.cise.logsconstants.LoggerUtil;
 import com.ufl.cise.messages.*;
@@ -24,6 +23,7 @@ public class PeerManager{
 	private int numPrefNeighbors = Common.getNumberOfPreferredNeighbors();
 	private int unchokingInterval = Common.getUnchokingInterval();
 	private int optUnchokingInterval = Common.getOptimisticUnchokingInterval();
+	private int numberOfPeers = peerInfo.numberOfPeers();
 	
 	
 
@@ -32,7 +32,6 @@ public class PeerManager{
 		uninterested = new HashSet<>();
 		prefNeighbors = new PriorityQueue<>(numPrefNeighbors + 1,(a, b) -> (int) a.getBytesDownloaded() - (int) b.getBytesDownloaded());
 		payloadProcess = PayloadProcess.getInstance();
-		System.out.println("clock started at "+System.currentTimeMillis());
 		splitFile =splitFile.getInstance();
 		allConnections = new ArrayList<Connection>();
 		interested = new HashSet<>();
@@ -126,9 +125,17 @@ public class PeerManager{
 		new Timer().scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
+				if(peersWithFullFile.size()==numberOfPeers-1 && splitFile.isCompleteFile()) {
+					System.out.println("All peers have files");
+					System.exit(0);
+				}
 				System.out.println("start choking after a sleep");
 				List<Connection> interestedPeers = new ArrayList<Connection>(interested);
-				System.out.println("Interested is empty "+interestedPeers.isEmpty());
+				System.out.println("Interested size "+interestedPeers.size());
+				if(!interestedPeers.isEmpty()) {
+					System.out.println("peer interested"+interestedPeers.get(0).remotePeerId);
+				}
+				System.out.println("pref neighbors empty"+prefNeighbors.isEmpty());
 				RemotePeerInfo peer = peerInfo.getPeer(peerProcess.getPeerId());
 				if(!prefNeighbors.isEmpty() && interestedPeers.size()>prefNeighbors.size()) {
 					if(peer!=null && peer.hasFile) {
