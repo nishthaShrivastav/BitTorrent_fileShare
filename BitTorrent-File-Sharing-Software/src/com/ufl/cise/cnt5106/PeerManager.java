@@ -102,7 +102,7 @@ public class PeerManager{
 			@Override
 			public void run() {
 				System.out.println("start opt unchoking after a sleep");
-				if(!allConnections.isEmpty() && interested.size()>preferredNeighbors.size()) {
+				if(null!=allConnections && null!= interested && null!=preferredNeighbors && !allConnections.isEmpty() && interested.size()>preferredNeighbors.size()) {
 					Collections.shuffle(allConnections);
 					for (Connection conn : allConnections) {
 						System.out.println("shuffled connections and iterating, interested empty, prefN empty"+interested.isEmpty()+" "+preferredNeighbors.isEmpty());
