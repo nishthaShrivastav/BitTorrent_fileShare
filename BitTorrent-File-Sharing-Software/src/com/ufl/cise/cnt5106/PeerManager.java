@@ -77,6 +77,7 @@ public class PeerManager{
 		uninterested.add(connection);
 		prefNeighbors.remove(connection);
 		interested.remove(connection);
+		System.out.println("Removing from interested and pref "+connection.remotePeerId);
 	}
 
 	public synchronized void addInterestedConnection(String peerId, Connection connection) {
@@ -105,6 +106,9 @@ public class PeerManager{
 					Collections.shuffle(allConnections);
 					for (Connection conn : allConnections) {
 						System.out.println("shuffled connections and iterating, interested empty, prefN empty"+interested.isEmpty()+" "+prefNeighbors.isEmpty());
+						System.out.println("interested.contains(conn) "+conn.remotePeerId +interested.contains(conn));
+						System.out.println("prefNeighbors contains conn "+prefNeighbors.contains(conn));
+						System.out.println("has file"+conn.hasFile());
 						if (interested.contains(conn) && !prefNeighbors.contains(conn) && !conn.hasFile()) {
 							System.out.println("opt Unchoke neighbor "+conn.remotePeerId);
 							payloadProcess.addMessage(new Object[] { conn, Message.MsgType.UNCHOKE, Integer.MIN_VALUE });
