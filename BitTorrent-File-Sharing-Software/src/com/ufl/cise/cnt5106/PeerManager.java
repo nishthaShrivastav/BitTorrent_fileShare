@@ -9,41 +9,8 @@ import java.util.*;
 import com.ufl.cise.conf.*;
 import com.ufl.cise.messages.*;
 
-public class PeerManager implements Runnable{
+public class PeerManager{
 
-	class OptimisticUnchoker extends Thread {
-		long start= System.currentTimeMillis();
-		private int optUnchokingInterval = Common.getOptimisticUnchokingInterval();
-		PriorityQueue<Connection> preferredNeighbors;
-		public OptimisticUnchoker() {
-			preferredNeighbors=getpreferredneighbours();
-		}
-		@Override
-		public void run() {
-			try {
-				
-				Thread.sleep(optUnchokingInterval*1000);
-			} catch (InterruptedException ex) {
-			}
-			long end=System.currentTimeMillis();
-			System.out.println("start opt unchoking after a sleep of "+(end-start)+" ms");
-			if(!allConnections.isEmpty() && interested.size()>preferredNeighbors.size()) {
-				Collections.shuffle(allConnections);
-				for (Connection conn : allConnections) {
-					System.out.println("shuffled connections and iterating, interested empty, prefN empty"+interested.isEmpty()+" "+preferredNeighbors.isEmpty());
-					if (interested.contains(conn) && !preferredNeighbors.contains(conn) && !conn.hasFile()) {
-						System.out.println("opt Unchoke neighbor "+conn.remotePeerId);
-						payloadProcess.addMessage(new Object[] { conn, Message.MsgType.UNCHOKE, Integer.MIN_VALUE });
-						preferredNeighbors.add(conn);
-						System.out.println("Optimistic unchoke done for peer "+conn.remotePeerId);
-						LoggerUtil.getInstance().logOptimisticallyUnchokeNeighbor(getTime(), peerProcess.getPeerId(),conn.getRemotePeerId());
-						break;
-					}
-				}
-			}
-
-		}
-	}
 
 	private static PeerManager peerManager;
 	private HashSet<Connection> uninterested;
@@ -51,12 +18,13 @@ public class PeerManager implements Runnable{
 	private PriorityQueue<Connection> prefNeighbors;
 	public HashSet<String> peersWithFullFile = new HashSet<String>();
 	private int numPrefNeighbors = Common.getNumberOfPreferredNeighbors();
-	private OptimisticUnchoker optUnchoker;
 	private int unchokingInterval = Common.getUnchokingInterval();
 	private List<Connection> allConnections;
 	private splitFile splitFile;
 	private PayloadProcess payloadProcess;
 	PeerInfoProperties peerInfo = new PeerInfoProperties();
+	private int optUnchokingInterval = Common.getOptimisticUnchokingInterval();
+	PriorityQueue<Connection> preferredNeighbors;
 
 	private PeerManager() {
 
@@ -68,73 +36,14 @@ public class PeerManager implements Runnable{
 		splitFile =splitFile.getInstance();
 		allConnections = new ArrayList<Connection>();
 		interested = new HashSet<>();
-		optUnchoker=new OptimisticUnchoker();
+		chokeUnchokePeers();
 
 	}
 
-	@Override
-	public void run() {
-		while(true) {
-			optUnchoker.start();
-			try {
-				Thread.sleep(unchokingInterval*1000);
-			}
-			catch(Exception e) {
-				e.printStackTrace();
-			}
-			System.out.println("start choking after a sleep");
-			List<Connection> interestedPeers = new ArrayList<Connection>(interested);
-			System.out.println("Interested is empty "+interestedPeers.isEmpty());
-			RemotePeerInfo peer = peerInfo.getPeer(peerProcess.getPeerId());
-			if(!prefNeighbors.isEmpty() && interestedPeers.size()>prefNeighbors.size()) {
-				if(peer!=null && peer.hasFile) {
-					Collections.shuffle(interestedPeers);
-
-				}
-				else {
-					Collections.sort(interestedPeers,
-							(a, b) -> (int) b.getBytesDownloaded() - (int) a.getBytesDownloaded());
-					//tempPref is used to decide which neighbors to choke after this 
-
-				}
-				PriorityQueue<Connection> toChoke = new PriorityQueue<Connection>();
-				PriorityQueue<Connection> oldPref = new PriorityQueue<Connection>();
-				toChoke.addAll(prefNeighbors);
-				oldPref.addAll(prefNeighbors);
-				//update preferred neighbors
-				prefNeighbors.clear();
-				prefNeighbors.addAll(interestedPeers.subList(0, Math.min(numPrefNeighbors, interestedPeers.size())));
-				PriorityQueue<Connection> toUnchoke = new PriorityQueue<Connection>();
-				//temp storage for the new pref neighbors
-				toUnchoke.addAll(prefNeighbors);
-
-				toChoke.removeAll(prefNeighbors);
-				toUnchoke.removeAll(oldPref);
-				for(Connection conn:allConnections) {
-					conn.setDownloadedbytes(0);
-				}
-				for(Connection conn : toChoke) {
-					payloadProcess.addMessage(new Object[] { conn, Message.MsgType.CHOKE, Integer.MIN_VALUE });
-					LoggerUtil.getInstance().logChangePreferredNeighbors(getTime(), peerProcess.getPeerId(),prefNeighbors);
-					System.out.println("Choking:" + conn.getRemotePeerId());
-
-				}
-
-				for(Connection conn: toUnchoke) {
-					payloadProcess.addMessage(new Object[] { conn, Message.MsgType.UNCHOKE, Integer.MIN_VALUE });
-					System.out.println("Unchoke new pref neighbors"+conn.remotePeerId);
-					LoggerUtil.getInstance().logUnchokingNeighbor(getTime(), conn.getRemotePeerId(), peerProcess.getPeerId());
-				}
-
-			}
-		}
-
-	}
 	public static PeerManager getPeerManager() {
 
 		if (peerManager == null) {
 			peerManager = new PeerManager();
-			peerManager.run();
 		}
 		return peerManager;
 
@@ -186,6 +95,82 @@ public class PeerManager implements Runnable{
 	public synchronized PriorityQueue<Connection> getpreferredneighbours(){
 		return prefNeighbors;
 
+	}
+	public void chokeUnchokePeers()
+	{
+		new Timer().scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				System.out.println("start opt unchoking after a sleep");
+				if(!allConnections.isEmpty() && interested.size()>preferredNeighbors.size()) {
+					Collections.shuffle(allConnections);
+					for (Connection conn : allConnections) {
+						System.out.println("shuffled connections and iterating, interested empty, prefN empty"+interested.isEmpty()+" "+preferredNeighbors.isEmpty());
+						if (interested.contains(conn) && !preferredNeighbors.contains(conn) && !conn.hasFile()) {
+							System.out.println("opt Unchoke neighbor "+conn.remotePeerId);
+							payloadProcess.addMessage(new Object[] { conn, Message.MsgType.UNCHOKE, Integer.MIN_VALUE });
+							preferredNeighbors.add(conn);
+							System.out.println("Optimistic unchoke done for peer "+conn.remotePeerId);
+							LoggerUtil.getInstance().logOptimisticallyUnchokeNeighbor(getTime(), peerProcess.getPeerId(),conn.getRemotePeerId());
+							break;
+						}
+					}
+				}
+			}
+		}, new Date(), optUnchokingInterval * 1000);
+
+
+		new Timer().scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				System.out.println("start choking after a sleep");
+				List<Connection> interestedPeers = new ArrayList<Connection>(interested);
+				System.out.println("Interested is empty "+interestedPeers.isEmpty());
+				RemotePeerInfo peer = peerInfo.getPeer(peerProcess.getPeerId());
+				if(!prefNeighbors.isEmpty() && interestedPeers.size()>prefNeighbors.size()) {
+					if(peer!=null && peer.hasFile) {
+						Collections.shuffle(interestedPeers);
+
+					}
+					else {
+						Collections.sort(interestedPeers,
+								(a, b) -> (int) b.getBytesDownloaded() - (int) a.getBytesDownloaded());
+						//tempPref is used to decide which neighbors to choke after this 
+
+					}
+					PriorityQueue<Connection> toChoke = new PriorityQueue<Connection>();
+					PriorityQueue<Connection> oldPref = new PriorityQueue<Connection>();
+					toChoke.addAll(prefNeighbors);
+					oldPref.addAll(prefNeighbors);
+					//update preferred neighbors
+					prefNeighbors.clear();
+					prefNeighbors.addAll(interestedPeers.subList(0, Math.min(numPrefNeighbors, interestedPeers.size())));
+					PriorityQueue<Connection> toUnchoke = new PriorityQueue<Connection>();
+					//temp storage for the new pref neighbors
+					toUnchoke.addAll(prefNeighbors);
+
+					toChoke.removeAll(prefNeighbors);
+					toUnchoke.removeAll(oldPref);
+					for(Connection conn:allConnections) {
+						conn.setDownloadedbytes(0);
+					}
+					for(Connection conn : toChoke) {
+						payloadProcess.addMessage(new Object[] { conn, Message.MsgType.CHOKE, Integer.MIN_VALUE });
+						LoggerUtil.getInstance().logChangePreferredNeighbors(getTime(), peerProcess.getPeerId(),prefNeighbors);
+						System.out.println("Choking:" + conn.getRemotePeerId());
+
+					}
+
+					for(Connection conn: toUnchoke) {
+						payloadProcess.addMessage(new Object[] { conn, Message.MsgType.UNCHOKE, Integer.MIN_VALUE });
+						System.out.println("Unchoke new pref neighbors"+conn.remotePeerId);
+						LoggerUtil.getInstance().logUnchokingNeighbor(getTime(), conn.getRemotePeerId(), peerProcess.getPeerId());
+					}
+
+				}
+
+			}
+		}, new Date(), unchokingInterval* 1000);
 	}
 
 }
