@@ -132,12 +132,10 @@ public class PeerManager{
 				System.out.println("start choking after a sleep");
 				List<Connection> interestedPeers = new ArrayList<Connection>(interested);
 				System.out.println("Interested size "+interestedPeers.size());
-				if(!interestedPeers.isEmpty()) {
-					System.out.println("peer interested"+interestedPeers.get(0).remotePeerId);
-				}
 				System.out.println("pref neighbors empty"+prefNeighbors.isEmpty());
 				RemotePeerInfo peer = peerInfo.getPeer(peerProcess.getPeerId());
 				if(!prefNeighbors.isEmpty() && interestedPeers.size()>prefNeighbors.size()) {
+					System.out.println("started choking/unchoking");
 					if(peer!=null && peer.hasFile) {
 						Collections.shuffle(interestedPeers);
 
@@ -161,12 +159,12 @@ public class PeerManager{
 
 					toChoke.removeAll(prefNeighbors);
 					toUnchoke.removeAll(oldPref);
+					System.out.println("Setting all down bytes to 0");
 					for(Connection conn:allConnections) {
 						conn.setDownloadedbytes(0);
 					}
 					for(Connection conn : toChoke) {
 						payloadProcess.addMessagetoQueue(new Object[] { conn, Message.MsgType.CHOKE, Integer.MIN_VALUE });
-						LoggerUtil.getLoggerInstance().logChangePreferredNeighbors(getTime(), peerProcess.getPeerId(),prefNeighbors);
 						System.out.println("Choking:" + conn.getRemotePeerId());
 
 					}
