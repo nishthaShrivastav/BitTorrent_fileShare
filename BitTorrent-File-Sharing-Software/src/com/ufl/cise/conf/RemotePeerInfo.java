@@ -5,8 +5,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RemotePeerInfo{
 
-
-
 		public String peerId;
 	 	public int id;
 	    public String peerPort;
@@ -21,16 +19,8 @@ public class RemotePeerInfo{
 	        hostName=H_Name;
 	    }
 	   
-	    public RemotePeerInfo (int peerId) {
-	        this (Integer.toString (peerId), "127.0.0.1", "0", false);
-	    }
-
 	    public String getPeerId() {
 			return peerId;
-		}
-
-		public void setPeerId(String peerId) {
-			this.peerId = peerId;
 		}
 
 		public int getId() {
@@ -45,35 +35,13 @@ public class RemotePeerInfo{
 			return Integer.parseInt(peerPort);
 		}
 
-		public void setPeerPort(String peerPort) {
-			this.peerPort = peerPort;
-		}
 
 		public boolean hasFile() {
 			return hasFile;
-		}
-
-		public void setHasFile(boolean hasFile) {
-			this.hasFile = hasFile;
 		}
 
 		public String getHostName() {
 			return hostName;
 		}
 
-		public void setHostName(String hostName) {
-			this.hostName = hostName;
-		}
-
-		@Override
-	    public boolean equals (Object obj) {
-	    	if (obj instanceof RemotePeerInfo) {
-	            return (((RemotePeerInfo) obj).peerId.equals (peerId));
-	        }
-	        if (obj == null) {
-	            return false;
-	        }
-	        
-	        return false;
-	    }
 }

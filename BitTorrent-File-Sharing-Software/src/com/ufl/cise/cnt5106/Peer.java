@@ -87,9 +87,5 @@ public class Peer {
 			System.out.println("Exception in createPeerConnection"+e);
 		}
 	}
-	
-
-	
-	
 
 }

@@ -9,19 +9,6 @@ public class Handshake {
 	
 	private static String message = "";
 	private static final String HANDSHAKE_HEADER = "P2PFILESHARINGPROJ0000000000";
-	
-
-	public static synchronized String get_Remote_PId(byte[] a) {
-		String id = "";
-		
-		int endId = a.length;
-		int startId = endId - 4;
-		byte[] idBytes = Arrays.copyOfRange(a, startId, endId);
-		
-		String idString = new String(idBytes, StandardCharsets.UTF_8);
-		return idString;
-				
-	}
 
 	public static synchronized byte[] message_get() {
 		
