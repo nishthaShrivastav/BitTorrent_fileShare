@@ -166,6 +166,7 @@ public class PeerManager implements Runnable{
 	public synchronized void addNotInterestedConnection(String peerId, Connection connection) {
 		uninterested.add(connection);
 		prefNeighbors.remove(connection);
+		interested.remove(connection);
 	}
 
 	public synchronized void addInterestedConnection(String peerId, Connection connection) {

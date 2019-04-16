@@ -187,12 +187,12 @@ public class SharedData extends Thread{
 			pieceIndex = splitFile.getRequestPieceIndex(connection);
 			if(pieceIndex!=Integer.MIN_VALUE)
 				connection.addRequestedPiece(pieceIndex);
-			if (pieceIndex == Integer.MIN_VALUE) {
+			else {
 				LoggerUtil.getInstance().logFinishedDownloading(getTime(), peerProcess.getPeerId());
 				splitFile.writeToFile(peerProcess.getPeerId());
 				msgType = null;
 				isAlive = false;
-				responseMsgType = null;
+				responseMsgType = MsgType.NOTINTERESTED;
 				// conn.close();
 			}
 			break;
