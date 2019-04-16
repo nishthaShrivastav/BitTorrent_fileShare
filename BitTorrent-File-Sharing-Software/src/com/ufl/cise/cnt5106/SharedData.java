@@ -178,12 +178,12 @@ public class SharedData extends Thread{
 			connection.addToBytesDownloaded(p.length);
 
 
-			connection.removeRequestedPiece(pieceIndex);
 			splitFile.setPiece(Arrays.copyOfRange(p, 1, p.length));
 			LoggerUtil.getInstance().logDownloadedPiece(getTime(), peerProcess.getPeerId(), connection.getRemotePeerId(),
 					pieceIndex, splitFile.getReceivedFileSize());
 			responseMsgType = MsgType.REQUEST;
 			connection.tellAllNeighbors(pieceIndex);
+			connection.removeRequestedPiece(pieceIndex);
 			pieceIndex = splitFile.getRequestPieceIndex(connection);
 			if(pieceIndex!=Integer.MIN_VALUE)
 				connection.addRequestedPiece(pieceIndex);
