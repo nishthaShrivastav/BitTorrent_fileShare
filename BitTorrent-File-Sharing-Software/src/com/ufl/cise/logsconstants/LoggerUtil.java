@@ -42,16 +42,16 @@ public class LoggerUtil {
 		}
 	}
 	
-	public void logTcpConnectionTo(String sourcePeer, String destinationPeer) {
-		writeLogFile(getTime() + "Peer " + sourcePeer + " makes a connection to Peer " + destinationPeer + ".");
-	}
-
 	public String getTime() {
 		return Calendar.getInstance().getTime() + ": ";
 	}
 	
-	public void logTcpConnectionFrom(String sourcePeer, String destinationPeer) {
-		writeLogFile(getTime() + "Peer " + sourcePeer + " is connected from Peer " + destinationPeer + ".");
+	public void logTcpConnectionTo(String sourcePeer, String destinationPeer) {
+		writeLogFile(getTime() + "Peer " + sourcePeer + " makes a connection to Peer " + destinationPeer + ".");
+	}
+	
+	public void logTcpConnectionFrom(String destinationPeer , String sourcePeer) {
+		writeLogFile(getTime() + "Peer " + destinationPeer + " is connected from Peer " + sourcePeer + ".");
 	}
 	
 	public void logChangePreferredNeighbors(String timestamp, int i, PriorityQueue<Connection> prefferedPeers) {
@@ -102,8 +102,5 @@ public class LoggerUtil {
 		writeLogFile(timestamp + "Peer " + i + " has downloaded the complete file.");
 	}
 	
-	public void logDebug(String message) {
-		writeLogFile(message);
-	}
 }
 
