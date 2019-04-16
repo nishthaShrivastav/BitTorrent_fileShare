@@ -183,12 +183,8 @@ public class SharedData extends Thread{
 			if(pieceIndex!=Integer.MIN_VALUE)
 				connection.addRequestedPiece(pieceIndex);
 			else {
-				LoggerUtil.getLoggerInstance().logFinishedDownloading(getTime(), peerProcess.getPeerId());
-				splitFile.writeToFile(peerProcess.getPeerId());
-				msgType = null;
-				isAlive = false;
+				System.out.println("No more interested in this peer");
 				responseMsgType = MsgType.NOTINTERESTED;
-				// conn.close();
 			}
 			break;
 		case HANDSHAKE:

@@ -11,6 +11,7 @@ import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -20,6 +21,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import com.ufl.cise.conf.Common;
 import com.ufl.cise.logsconstants.Constants;
+import com.ufl.cise.logsconstants.LoggerUtil;
 
 /*
  * file created to split the file into pieces 
@@ -163,10 +165,15 @@ public class SplitFile extends Thread{
 	public synchronized void setPiece(byte[] payload) {
 		filePieceswithPeer.set(ByteBuffer.wrap(payload, 0, 4).getInt());
 		fileMap.put(ByteBuffer.wrap(payload, 0, 4).getInt(), Arrays.copyOfRange(payload, 4, payload.length));
+
 		try {
 			fileQueue.put(payload);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+		}
+		if(isCompleteFile()) {
+			LoggerUtil.getLoggerInstance().logFinishedDownloading(Calendar.getInstance().getTime() + ": ", peerProcess.getPeerId());
+			writeToFile(peerProcess.getPeerId());
 		}
 	}
 	public synchronized void writeToFile(int peerId) {
@@ -201,7 +208,6 @@ public class SplitFile extends Thread{
 		
 		if (isCompleteFile()) {
 			System.out.println("File received");
-			System.out.println("clock ended at "+System.currentTimeMillis());
 			return Integer.MIN_VALUE;
 		}
 		BitSet peerBitset = conn.getPeerBitSet();
