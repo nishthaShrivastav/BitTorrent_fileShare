@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.PriorityQueue;
 
@@ -54,18 +55,21 @@ public class LoggerUtil {
 		writeLogFile(getTime() + "Peer " + destinationPeer + " is connected from Peer " + sourcePeer + ".");
 	}
 	
-	public void logChangePreferredNeighbors(String timestamp, int i, PriorityQueue<Connection> prefferedPeers) {
-		StringBuilder log = new StringBuilder();
-		log.append(timestamp);
-		log.append("Peer " + i + " has the preferred neighbors ");
-		String prefix = "";
-		Iterator<Connection> iterator = prefferedPeers.iterator();
-		while (iterator.hasNext()) {
-			log.append(prefix);
-			prefix = ", ";
-			log.append(iterator.next().getRemotePeerId());
+	public void logChangePreferredNeighbors(String timestamp, int i, Collection<Connection> preferredPeers) {
+		if(!preferredPeers.isEmpty()) {
+			StringBuilder log = new StringBuilder();
+			log.append(timestamp);
+			log.append("Peer " + i + " has the preferred neighbors ");
+			String prefix = "";
+			Iterator<Connection> iterator = preferredPeers.iterator();
+			while (iterator.hasNext()) {
+				log.append(prefix);
+				prefix = ", ";
+				log.append(iterator.next().getRemotePeerId());
+			}
+			writeLogFile(log.toString() + ".");
 		}
-		writeLogFile(log.toString() + ".");
+		
 	}
 	
 	public void logOptimisticallyUnchokeNeighbor(String timestamp, int i, String unchokedNeighbor) {

@@ -140,15 +140,16 @@ public class PeerManager{
 				System.out.println("start choking after a sleep");
 				List<Connection> interestedPeers = new ArrayList<Connection>(interested);
 				System.out.println("Interested size "+interestedPeers.size());
-				System.out.println("pref neighbors empty"+prefNeighbors.isEmpty());
-				RemotePeerInfo peer = peerInfo.getPeer(peerProcess.getPeerId());
+				System.out.println("pref neighbors size"+prefNeighbors.size());
 				if(!prefNeighbors.isEmpty() && interestedPeers.size()>prefNeighbors.size()) {
 					System.out.println("started choking/unchoking");
-					if(peer!=null && peer.hasFile) {
+					if(splitFile.isCompleteFile()) {
+						System.out.println("peer has file, shuffle");
 						Collections.shuffle(interestedPeers);
 
 					}
 					else {
+						System.out.println("peer sorting files");
 						Collections.sort(interestedPeers,
 								(a, b) -> (int) b.getBytesDownloaded() - (int) a.getBytesDownloaded());
 						//tempPref is used to decide which neighbors to choke after this 
@@ -160,7 +161,7 @@ public class PeerManager{
 					for(int i=0;i<Math.min(numPrefNeighbors, interestedPeers.size());i++) {
 						prefNeighbors.add(interestedPeers.get(i));
 					}
-					List<Connection> newPref = new ArrayList(prefNeighbors);
+					List<Connection> newPref = new ArrayList<Connection>(prefNeighbors);
 					//temp storage for the new pref neighbors
 					
 					Collection<Connection> toChoke = CollectionUtils.subtract(oldPref, newPref);
@@ -174,7 +175,7 @@ public class PeerManager{
 						payloadProcess.addMessagetoQueue(new Object[] { conn, Message.MsgType.CHOKE, Integer.MIN_VALUE });
 						System.out.println("Choking:" + conn.getRemotePeerId());
 					}
-
+					LoggerUtil.getLoggerInstance().logChangePreferredNeighbors(getTime(), peerProcess.getPeerId(), toUnchoke);
 					for(Connection conn: toUnchoke) {
 						payloadProcess.addMessagetoQueue(new Object[] { conn, Message.MsgType.UNCHOKE, Integer.MIN_VALUE });
 						System.out.println("Unchoke new pref neighbors"+conn.remotePeerId);

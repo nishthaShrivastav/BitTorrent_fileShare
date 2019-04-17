@@ -180,8 +180,11 @@ public class SharedData extends Thread{
 			connection.sendHavetoAll(pieceIndex);
 			connection.removeRequestedPiece(pieceIndex);
 			pieceIndex = splitFile.getRequestPieceIndex(connection);
-			if(pieceIndex!=Integer.MIN_VALUE)
+			if(pieceIndex!=Integer.MIN_VALUE) {
 				connection.addRequestedPiece(pieceIndex);
+				System.out.println("Asking for another piece"+pieceIndex);
+			}
+				
 			else {
 				System.out.println("No more interested in this peer");
 				responseMsgType = MsgType.NOTINTERESTED;
