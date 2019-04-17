@@ -40,6 +40,7 @@ public class SplitFile extends Thread{
 	private volatile HashMap<Integer, Connection> requestedPieces;
 	private static ConcurrentHashMap<Integer, byte[]> fileMap;
 	private static FileChannel fileOut;
+	private boolean writing =false;
 	
 	private SplitFile() {
 		fileQueue = new LinkedBlockingQueue<>();
@@ -144,7 +145,7 @@ public class SplitFile extends Thread{
 	}
 
 
-	public boolean hasAnyPieces() {
+	public synchronized boolean hasAnyPieces() {
 		return filePieceswithPeer.nextSetBit(0) != -1;
 	}
 	
@@ -163,6 +164,7 @@ public class SplitFile extends Thread{
 	}
 	
 	public synchronized void setPiece(byte[] payload) {
+		
 		filePieceswithPeer.set(ByteBuffer.wrap(payload, 0, 4).getInt());
 		fileMap.put(ByteBuffer.wrap(payload, 0, 4).getInt(), Arrays.copyOfRange(payload, 4, payload.length));
 
@@ -171,14 +173,15 @@ public class SplitFile extends Thread{
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		if(isCompleteFile()) {
+		if(isCompleteFile() && !writing) {
+			writing=true;
 			LoggerUtil.getLoggerInstance().logFinishedDownloading(Calendar.getInstance().getTime() + ": ", peerProcess.getPeerId());
 			writeToFile(peerProcess.getPeerId());
 		}
 	}
 	public synchronized void writeToFile(int peerId) {
-		
-			for (int i = 0; i < fileMap.size(); i++) {
+		System.out.println("Final fileMap"+ fileMap);
+		for (int i = 0; i < fileMap.size(); i++) {
 				try {
 					ByteBuffer Bb = ByteBuffer.wrap(fileMap.get(i));
 					fileOut.write(Bb);
@@ -199,7 +202,7 @@ public class SplitFile extends Thread{
 	}
 	
 	
-	public static BitSet getFilePieces() {
+	public BitSet getFilePieces() {
 		return filePieceswithPeer;
 	}
 

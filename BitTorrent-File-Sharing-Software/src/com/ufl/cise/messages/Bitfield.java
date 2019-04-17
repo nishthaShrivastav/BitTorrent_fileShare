@@ -21,7 +21,7 @@ public class Bitfield extends Message {
 			content = new byte[numPieces];
 			splitFile = SplitFile.getInstance();
 			messageContent[0] = msgNum;
-			BitSet filePieces = SplitFile.getFilePieces();
+			BitSet filePieces = splitFile.getFilePieces();
 			for (int i = 0; i < numPieces; i++) {
 				if (filePieces.get(i)) {
 					messageContent[i + 1] = 1;

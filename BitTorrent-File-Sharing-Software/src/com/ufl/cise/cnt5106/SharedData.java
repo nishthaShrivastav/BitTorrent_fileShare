@@ -27,8 +27,8 @@ public class SharedData extends Thread{
 	private Connection connection;
 	private volatile boolean uploadHandshake;
 	private DataOut upload;
-	private boolean bitfieldSent;
-	private boolean isHandshakeDownloaded;
+	private volatile boolean bitfieldSent;
+	private volatile boolean isHandshakeDownloaded;
 	private MessageHandler messagehandler;
 	private boolean peerHasFile;
 	private PayloadProcess payloadProcess;

@@ -2,9 +2,14 @@ package com.ufl.cise.cnt5106;
 
 import java.net.Socket;
 import java.util.*;
+
+import org.apache.commons.collections.CollectionUtils;
+
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 import com.ufl.cise.conf.*;
 import com.ufl.cise.logsconstants.LoggerUtil;
 import com.ufl.cise.messages.*;
+
 
 public class PeerManager{
 
@@ -25,7 +30,6 @@ public class PeerManager{
 	private int optUnchokingInterval = Common.getOptimisticUnchokingInterval();
 	private int numberOfPeers = peerInfo.numberOfPeers();
 	
-	
 
 	private PeerManager() {
 
@@ -39,7 +43,7 @@ public class PeerManager{
 
 	}
 
-	public static PeerManager getPeerManagerInstance() {
+	public static synchronized PeerManager getPeerManagerInstance() {
 
 		if (peerManager == null) {
 			peerManager = new PeerManager();
@@ -101,6 +105,10 @@ public class PeerManager{
 			@Override
 			public void run() {
 				System.out.println("start opt unchoking after a sleep");
+				if(peersWithFullFile.size()==numberOfPeers-1 && splitFile.isCompleteFile()) {
+					System.out.println("All peers have files");
+					System.exit(0);
+				}
 				if(null!=allConnections && null!= interested && null!=prefNeighbors && !allConnections.isEmpty() && interested.size()>prefNeighbors.size()) {
 					Collections.shuffle(allConnections);
 					for (Connection conn : allConnections) {
@@ -119,7 +127,7 @@ public class PeerManager{
 					}
 				}
 			}
-		}, new Date(), optUnchokingInterval * 1000);
+		}, new Date(), optUnchokingInterval*1000);
 
 
 		new Timer().scheduleAtFixedRate(new TimerTask() {
@@ -146,19 +154,18 @@ public class PeerManager{
 						//tempPref is used to decide which neighbors to choke after this 
 
 					}
-					PriorityQueue<Connection> toChoke = new PriorityQueue<Connection>();
-					PriorityQueue<Connection> oldPref = new PriorityQueue<Connection>();
-					toChoke.addAll(prefNeighbors);
-					oldPref.addAll(prefNeighbors);
+					List<Connection> oldPref = new ArrayList(prefNeighbors);
 					//update preferred neighbors
 					prefNeighbors.clear();
-					prefNeighbors.addAll(interestedPeers.subList(0, Math.min(numPrefNeighbors, interestedPeers.size())));
-					PriorityQueue<Connection> toUnchoke = new PriorityQueue<Connection>();
+					for(int i=0;i<Math.min(numPrefNeighbors, interestedPeers.size());i++) {
+						prefNeighbors.add(interestedPeers.get(i));
+					}
+					List<Connection> newPref = new ArrayList(prefNeighbors);
 					//temp storage for the new pref neighbors
-					toUnchoke.addAll(prefNeighbors);
+					
+					Collection<Connection> toChoke = CollectionUtils.subtract(oldPref, newPref);
+					Collection<Connection> toUnchoke = CollectionUtils.subtract(newPref, oldPref);
 
-					toChoke.removeAll(prefNeighbors);
-					toUnchoke.removeAll(oldPref);
 					System.out.println("Setting all down bytes to 0");
 					for(Connection conn:allConnections) {
 						conn.setDownloadedbytes(0);
@@ -166,7 +173,6 @@ public class PeerManager{
 					for(Connection conn : toChoke) {
 						payloadProcess.addMessagetoQueue(new Object[] { conn, Message.MsgType.CHOKE, Integer.MIN_VALUE });
 						System.out.println("Choking:" + conn.getRemotePeerId());
-
 					}
 
 					for(Connection conn: toUnchoke) {
@@ -178,7 +184,7 @@ public class PeerManager{
 				}
 
 			}
-		}, new Date(), unchokingInterval* 1000);
+		}, new Date(), unchokingInterval*1000);
 	}
 
 }
