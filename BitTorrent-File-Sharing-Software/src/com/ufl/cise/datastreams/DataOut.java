@@ -34,7 +34,6 @@ public class DataOut implements Runnable {
 		this.socket = client;
 		try {
 			outstream = new DataOutputStream(socket.getOutputStream());
-			System.out.println("Created output data stream for "+client.getPort());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -45,7 +44,6 @@ public class DataOut implements Runnable {
 	@Override
 	public void run() {
 		while (isAlive) {
-			System.out.println("DataOut run started");
 			try {
 				int messageLength = dataoutlengthqueue.take();
 				outstream.writeInt(messageLength);

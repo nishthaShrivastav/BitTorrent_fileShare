@@ -19,14 +19,13 @@ public class LoggerUtil {
 
 	private LoggerUtil() {
 	try {
-		System.out.println(Peer.getInstance().getPeerID());
 		File logFile = new File(Constants.LOG_FILE_PATH + Peer.getInstance().getPeerID() + Constants.LOG_FILE_EXTENSION);
 		logFile.getParentFile().mkdirs();
 		logFile.createNewFile();
 		FileOutputStream fileOutputStream = new FileOutputStream(logFile, false);
 		printWriter = new PrintWriter(fileOutputStream, true);
 		} catch (Exception e) {
-			System.out.println("Error: Failed to create log file");
+			e.printStackTrace();
 		}
 	}
 

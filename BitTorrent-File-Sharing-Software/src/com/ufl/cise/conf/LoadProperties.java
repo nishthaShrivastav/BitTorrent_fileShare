@@ -21,7 +21,6 @@ public class LoadProperties {
 
 			properties.load(in);
 		} catch (IOException e) {
-			System.out.println("Config file not found");
 			e.printStackTrace();
 		}
 

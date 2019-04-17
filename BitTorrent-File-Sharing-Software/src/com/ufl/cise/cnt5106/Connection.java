@@ -35,10 +35,8 @@ public class Connection {
 		sharedData = new SharedData(this);
 		dataOut = new DataOut(peerSocket, peerId,sharedData);
 		dataIn = new DataIn(peerSocket,peerId,sharedData);
-		System.out.println("about to create up down threads, connection th "+Thread.currentThread().getName());
 		setChannels(dataOut, dataIn);
 		LoggerUtil.getLoggerInstance().logTcpConnectionTo(Peer.getInstance().getPeerInfo().getPeerId(), peerId);
-		System.out.println("Sending handshake to "+peerId);
 		sharedData.sendHandshake();
 		sharedData.setUploadHandshake(dataOut);
 		sharedData.start();

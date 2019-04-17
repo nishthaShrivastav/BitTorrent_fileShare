@@ -45,11 +45,9 @@ public class Peer {
 			//continue while all peers are yet to receive the file
 			while (false == allPeersReceivedFiles) {
 				Socket clientSocket = socket.accept();
-				System.out.println("Listening on socket");
 				peerManager.createConnection(clientSocket);
 			}
 		} catch (Exception e) {
-			System.out.println("Exception in connnectToPeers"+e);
 			e.printStackTrace();
 		} finally {
 			socket.close();
@@ -63,7 +61,6 @@ public class Peer {
 				new Thread() {
 					@Override
 					public void run() {
-						System.out.println("Starting connection with"+pi.getHostName());
 						sendConnectionRequest(pi);
 					}
 				}.start();
@@ -77,14 +74,12 @@ public class Peer {
 		int peerPort = pi.getPeerPort();
 		String peerHost= pi.getHostName();
 		try {
-			System.out.println("about to create socket ");
 			Socket socket = new Socket(peerHost, peerPort);
-			System.out.println("created socket for"+pi.getHostName());
 			peerManager.createConnection(socket,pi.getPeerId());
 			Thread.sleep(300);
 		}
 		catch(Exception e) {
-			System.out.println("Exception in createPeerConnection"+e);
+			e.printStackTrace();
 		}
 	}
 

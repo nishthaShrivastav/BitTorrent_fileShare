@@ -39,10 +39,8 @@ public class DataIn implements Runnable {
 
 	@Override
 	public void run() {
-		System.out.println("DataIn run started");
 
 		while (isAlive()) {
-			System.out.println("is alive");
 			int messageLength = Integer.MIN_VALUE;
 			messageLength = findMessageLength();
 			if (!isAlive()) {
@@ -50,11 +48,9 @@ public class DataIn implements Runnable {
 			}
 			byte[] payload = new byte[messageLength];
 			takeinMessage(payload);
-			System.out.println("Received message and adding payload to shareddata" +insocket.getPort());
 			sharedData.addPayload(payload);
 
 		}
-		System.out.println("Dead");
 
 	}
 
@@ -80,7 +76,6 @@ public class DataIn implements Runnable {
 			instream.readFully(messageLength);
 		}
 		catch(SocketException socketException) {
-			System.out.println("Received file");
 			isAlive=false;
 			System.exit(0);
 		}

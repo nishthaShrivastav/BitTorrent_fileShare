@@ -69,7 +69,6 @@ public class SplitFile extends Thread{
 			fileOut = FileChannel.open(outputFile.toPath(), StandardOpenOption.WRITE);
 			
 		} catch (IOException e) {
-			System.out.println("Failed to create new file while receiving the file from host peer");
 			e.printStackTrace();
 		}
 	}
@@ -109,12 +108,10 @@ public class SplitFile extends Thread{
 					
 				}catch(IOException e) {
 					
-			System.out.println("Error while splitting file");
 			e.printStackTrace();
 		}
 	}catch (FileNotFoundException e) {
 		
-			System.out.println("Error reading Configuration file");
 			}finally {
 				
 						try {
@@ -123,7 +120,6 @@ public class SplitFile extends Thread{
 							} catch (IOException e) {
 								
 									e.printStackTrace();
-									System.out.println("Error while closing fileinputstream after reading file");
 							}
 					}
 	}// end split function
@@ -209,7 +205,6 @@ public class SplitFile extends Thread{
 	public synchronized int getRequestPieceIndex(Connection conn) {
 		
 		if (isCompleteFile()) {
-			System.out.println("File received");
 			return Integer.MIN_VALUE;
 		}
 		BitSet peerBitset = conn.getPeerBitSet();

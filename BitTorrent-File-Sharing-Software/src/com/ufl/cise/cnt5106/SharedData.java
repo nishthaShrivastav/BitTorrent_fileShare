@@ -61,10 +61,8 @@ public class SharedData extends Thread{
 		while (isAlive) {
 			try {
 				byte[] p = payloadQueue.take();
-				System.out.println("sharedData: get payload from queue and send for processing");
 				processPayload(p);
 			} catch (InterruptedException e) {
-				System.out.println("Error in SharedData thread"+e);
 			}
 		}
 	}
@@ -73,7 +71,6 @@ public class SharedData extends Thread{
 		try {
 			payloadQueue.put(payload);
 		} catch (InterruptedException e) {
-			System.out.println("Error in SharedAData addPayload"+e);
 		}
 		
 	}
@@ -94,7 +91,6 @@ public class SharedData extends Thread{
 		MsgType msgType = getMessageType(p[0]);
 		MsgType responseMsgType = null;
 		int pieceIndex = Integer.MIN_VALUE;
-		System.out.println("Shareddata processPayload message received:"+msgType);
 		switch (msgType) {
 		case CHOKE:
 			LoggerUtil.getLoggerInstance().logChokingNeighbor(getTime(),peerProcess.getPeerId(),connection.getRemotePeerId());
@@ -156,7 +152,6 @@ public class SharedData extends Thread{
 				System.arraycopy(p, 1, content, 0, 4);
 				pieceIndex = ByteBuffer.wrap(content).getInt();
 				if (pieceIndex == Integer.MIN_VALUE) {
-					System.out.println("received file");
 					responseMsgType = null;
 				}
 			}
@@ -182,24 +177,19 @@ public class SharedData extends Thread{
 			pieceIndex = splitFile.getRequestPieceIndex(connection);
 			if(pieceIndex!=Integer.MIN_VALUE) {
 				connection.addRequestedPiece(pieceIndex);
-				System.out.println("Asking for another piece"+pieceIndex);
 			}
 				
 			else {
-				System.out.println("No more interested in this peer");
 				responseMsgType = MsgType.NOTINTERESTED;
 			}
 			break;
 		case HANDSHAKE:
 			remotePeerId = Handshake.get_Id(p);
-			System.out.println("Received handhake and setting remotepeerid as "+remotePeerId);
 			connection.setPeerId(remotePeerId);
 			connection.addAllConnections();
 			if (!getUploadHandshake()) {
 				setUploadHandshake();
-				System.out.println("Setting uploadHandshake with peer "+remotePeerId);
 				LoggerUtil.getLoggerInstance().logTcpConnectionFrom(host.getPeerInfo().getPeerId(), remotePeerId);
-				System.out.println("Sending handshake response to "+remotePeerId);
 				payloadProcess.addMessagetoQueue(new Object[] { connection, MsgType.HANDSHAKE, Integer.MIN_VALUE });
 			}
 			if (splitFile.hasAnyPieces()) {
@@ -207,7 +197,6 @@ public class SharedData extends Thread{
 			}
 			break;
 		}
-		System.out.println("Sending response messagetype :"+responseMsgType+"to "+remotePeerId);
 		if (null != responseMsgType) {
 
 			payloadProcess.addMessagetoQueue(new Object[] { connection, responseMsgType, pieceIndex });

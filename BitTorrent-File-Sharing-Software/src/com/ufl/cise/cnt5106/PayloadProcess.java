@@ -40,7 +40,6 @@ public class PayloadProcess extends Thread {
 	@Override
 	public void run() {
 		while (true) {
-			System.out.println("PayloadProcess run started");
 			Object[] inputMessage = getMessage();
 			connection = (Connection) inputMessage[0];
 			msgType = (Message.MsgType) inputMessage[1];
@@ -48,14 +47,12 @@ public class PayloadProcess extends Thread {
 			int messageLength = messageHandler.getMessageLength(msgType, pieceIndex);
 			byte[] payload = messageHandler.getMessageContent(msgType, pieceIndex);
 			connection.sendMessage(messageLength, payload);
-			System.out.println("PayloadProcess: Sending " + msgType + " to peer ") ;
 
 		}
 	}
 	private Object[] getMessage() {
 		Object[] inputMessage = null;
 		try {
-			System.out.println("payloadprocess waiting on queue");
 			inputMessage = messageQueue.take();
 		} catch (InterruptedException e) {
 			e.printStackTrace();

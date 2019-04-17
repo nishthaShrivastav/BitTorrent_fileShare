@@ -54,8 +54,4 @@ public class Common {
 		numberOfPieces = (int) (fileSize % pieceSize) == 0 ? (int) (fileSize / pieceSize)
 				: (int) (fileSize / pieceSize) + 1;
 	}
-	public static void logProperties() {
-		System.out.println("Common properties:-- number Of Preferred Neighbors: "+numberOfPreferredNeighbors+"unchokingInterval: "+unchokingInterval+"optimisticUnchokingInterval: "+optimisticUnchokingInterval+"fileName: "+fileName+"file size: "+fileSize+"peice size: "+pieceSize+"number of pieces: "+numberOfPieces);
-		
-	}
 }

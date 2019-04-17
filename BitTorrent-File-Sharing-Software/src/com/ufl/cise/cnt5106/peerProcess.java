@@ -27,12 +27,10 @@ public class peerProcess {
 			Handshake.set_Id(args[0]);
 			if((PeerInfo.getPeer(peerId)).hasFile()) {
 				SplitFile splitFile=SplitFile.getInstance();
-				System.out.println("split file returned");
 				splitFile.split();
 			}
 
 			Peer peer = Peer.getInstance();
-			System.out.println("Peer "+peerId+" starting connections");
 			peer.sendConnections();
 			peer.listenforConnections();
 		}
