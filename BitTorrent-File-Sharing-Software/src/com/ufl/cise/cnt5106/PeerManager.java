@@ -102,6 +102,7 @@ public class PeerManager{
 			@Override
 			public void run() {
 				if(peersWithFullFile.size()==numberOfPeers-1 && splitFile.isCompleteFile()) {
+					System.out.println("All peers received file");
 					System.exit(0);
 				}
 				if(null!=allConnections && null!= interested && null!=prefNeighbors && !allConnections.isEmpty() && interested.size()>prefNeighbors.size()) {
@@ -123,6 +124,7 @@ public class PeerManager{
 			@Override
 			public void run() {
 				if(peersWithFullFile.size()==numberOfPeers-1 && splitFile.isCompleteFile()) {
+					System.out.println("All peers received file");
 					System.exit(0);
 				}
 				List<Connection> interestedPeers = new ArrayList<Connection>(interested);
