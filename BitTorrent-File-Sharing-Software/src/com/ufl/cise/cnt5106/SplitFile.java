@@ -40,7 +40,7 @@ public class SplitFile extends Thread{
 	private volatile HashMap<Integer, Connection> requestedPieces;
 	private static ConcurrentHashMap<Integer, byte[]> fileMap;
 	private static FileChannel fileOut;
-	private boolean writing =false;
+	private boolean fileWritten =false;
 	
 	private SplitFile() {
 		fileQueue = new LinkedBlockingQueue<>();
@@ -104,7 +104,7 @@ public class SplitFile extends Thread{
 						
 							dataInputStream.readFully(piece);
 							fileMap.put(pieceIndex, piece);  
-							filePieceswithPeer.set(pieceIndex++);
+							getFilePieces().set(pieceIndex++);
 					}	//end for
 					
 				}catch(IOException e) {
@@ -133,20 +133,20 @@ public class SplitFile extends Thread{
 	}
 	
 	public synchronized boolean isPieceAvailable(int index) {
-		return filePieceswithPeer.get(index);
+		return getFilePieces().get(index);
 	}
 	
 	public synchronized int getReceivedFileSize() {
-		return filePieceswithPeer.cardinality();
+		return getFilePieces().cardinality();
 	}
 	
 	public synchronized boolean isCompleteFile() {
-		return filePieceswithPeer.cardinality() == Common.getNumberOfPieces();
+		return getFilePieces().cardinality() == Common.getNumberOfPieces();
 	}
 
 
 	public synchronized boolean hasAnyPieces() {
-		return filePieceswithPeer.nextSetBit(0) != -1;
+		return getFilePieces().nextSetBit(0) != -1;
 	}
 	
 	@Override
@@ -165,7 +165,7 @@ public class SplitFile extends Thread{
 	
 	public synchronized void setPiece(byte[] payload) {
 		
-		filePieceswithPeer.set(ByteBuffer.wrap(payload, 0, 4).getInt());
+		getFilePieces().set(ByteBuffer.wrap(payload, 0, 4).getInt());
 		fileMap.put(ByteBuffer.wrap(payload, 0, 4).getInt(), Arrays.copyOfRange(payload, 4, payload.length));
 
 		try {
@@ -173,14 +173,13 @@ public class SplitFile extends Thread{
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		if(isCompleteFile() && !writing) {
-			writing=true;
+		if(isCompleteFile() && !fileWritten) {
+			fileWritten=true;
 			LoggerUtil.getLoggerInstance().logFinishedDownloading(Calendar.getInstance().getTime() + ": ", peerProcess.getPeerId());
 			writeToFile(peerProcess.getPeerId());
 		}
 	}
 	public synchronized void writeToFile(int peerId) {
-		System.out.println("Final fileMap"+ fileMap);
 		for (int i = 0; i < fileMap.size(); i++) {
 				try {
 					ByteBuffer Bb = ByteBuffer.wrap(fileMap.get(i));
@@ -202,7 +201,7 @@ public class SplitFile extends Thread{
 	}
 	
 	
-	public BitSet getFilePieces() {
+	public synchronized BitSet getFilePieces() {
 		return filePieceswithPeer;
 	}
 
@@ -216,14 +215,14 @@ public class SplitFile extends Thread{
 		BitSet peerBitset = conn.getPeerBitSet();
 		int numberOfPieces = Common.getNumberOfPieces();
 		BitSet peerClone = (BitSet) peerBitset.clone();
-		BitSet myClone = (BitSet) filePieceswithPeer.clone();
+		BitSet myClone = (BitSet) getFilePieces().clone();
 		peerClone.andNot(myClone);
 		if (peerClone.cardinality() == 0) {
 			return Integer.MIN_VALUE;
 		}
-		myClone.flip(0, numberOfPieces);
-		myClone.and(peerClone);
-		int[] missingPieces = myClone.stream().toArray();
+//		myClone.flip(0, numberOfPieces);
+//		myClone.and(peerClone);
+		int[] missingPieces = peerClone.stream().toArray();
 		int askpieceindex=new Random().nextInt(missingPieces.length);
 		while(requestedPieces.containsKey(askpieceindex)) {
 			askpieceindex=new Random().nextInt(missingPieces.length);
